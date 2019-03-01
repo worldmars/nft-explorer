@@ -1,0 +1,62 @@
+<head>
+	<!--<script src=https://cdn.jsdelivr.net/npm/o3-dapi-core@0.1.2/lib/o3-dapi-core.min.js></script> -->
+    <!--<script src=https://cdn.jsdelivr.net/npm/o3-dapi-neo@0.1.1/lib/o3-dapi-neo.min.js></script> -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/smarteco@1.0.4/lib/smartEco.min.js"></script>
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue"></script>
+	<script type="text/javascript" src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+	<div id="app">
+		<h1>NFT Explorer</h1>
+		Contract Hash:<br>
+  		<input v-model="contract_hash" >
+  		<br>
+ 		Token ID:<br>
+  		<input v-model="token_id">
+  		<br><br>
+  		<button v-on:click="getUrlForToken">Submit</button>
+		<img v-bind:src="image_url"/>
+</div>
+<script type="text/javascript">
+	var app = new Vue({
+		el: '#app',
+		data: {
+			contract_hash:"ef26427f9eaeed31c57884dbbc2bda5de7b5dab8",
+			token_id: 0,
+			image_url:""
+		}, 
+		methods:{
+			getUrlForToken(){
+				var self = this;
+				smartEcoRouter = new smartEco.SmartEcoRouter()
+				smartEcoRouter.start()
+				//o3dapi.initPlugins([o3dapiNeo]);
+				var invokeRequest = {
+					"scriptHash": this.contract_hash,
+  					"operation": "uri",
+  					"args": [
+    					{
+      						"type": 'Integer',
+      						"value": parseInt(this.token_id, 10)
+      					}
+  					],
+  					"network": "TestNet"}
+				 	smartEcoRouter.invokeRead(invokeRequest)
+					.then(function(r) {
+						var hex = r["stack"][0]["value"]
+    					var str = '';
+    					for (var i = 0; (i < hex.length && hex.substr(i, 2) !== '00'); i += 2)
+        					str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+						console.log(str)
+						self.image_url = str
+						console.log(this.image_url)
+					})
+					.catch(function(e) {
+						console.log(e)
+					}) 
+			}
+		}
+	});
+</script>>
+
+</body>
