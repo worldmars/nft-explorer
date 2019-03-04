@@ -18,7 +18,53 @@
 	<script type="text/javascript" src="https://unpkg.com/axios/dist/axios.min.js"></script>
 </head>
 <body>
+	<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+		<a class="navbar-brand" href="#"><img src="https://cdn.o3.network/logo/logo-dark.png" srcset="https://cdn.o3.network/logo/logo-dark@2x.png 2x" height="30" /></a>
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar_example_1" aria-controls="navbar_example_1" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<div class="collapse navbar-collapse" id="navbar_example_1">
+			<ul class="navbar-nav ml-auto">
+				<li class="nav-item active">
+					<a class="nav-link" href="https://o3.network" target="_blank">Download O3</a>
+				</li>
+			</ul>
+		</div>
+	</nav>
+
 	<div id="app">
+	<section class="container">
+
+
+		<div class="row row-grid mt-lg d-lg-flex">
+			<div class="col col-lg-6 mb-lg-4" v-for="nft in token_urls">
+				<div class="card shadow">
+					<div class="card-body">
+						<div class="d-flex align-items-start ">
+							<div class="">
+								<img v-bind:src="nft" height="44px" />
+							</div>
+							<div class="icon-text px-4">
+								<h5 class="">OWNER</h5>
+								<div class="mb-0">TOKEN ID</div>
+							</div>
+						</div>
+						
+					</div>
+					<div class="card-footer">
+						Footer Goes Here
+					</div>
+				</div>
+			</div>
+		</div>  
+
+
+	</section>
+
+
+
+
+
 		<h1>NFT Explorer</h1>
 		Contract Hash:<br>
   		<input v-model="contract_hash" >
@@ -26,50 +72,9 @@
  		Token ID:<br>
   		<input v-model="token_id">
   		<br><br>
-  		<button v-on:click="getUrlForToken">Submit</button>
+  		<button v-on:click="loadAllTokens">Submit</button>
 		<img v-bind:src="image_url"/>
 </div>
-<script type="text/javascript">
-	var app = new Vue({
-		el: '#app',
-		data: {
-			contract_hash:"ef26427f9eaeed31c57884dbbc2bda5de7b5dab8",
-			token_id: 0,
-			image_url:""
-		}, 
-		methods:{
-			getUrlForToken(){
-				var self = this;
-				smartEcoRouter = new smartEco.SmartEcoRouter()
-				smartEcoRouter.start()
-				//o3dapi.initPlugins([o3dapiNeo]);
-				var invokeRequest = {
-					"scriptHash": this.contract_hash,
-  					"operation": "uri",
-  					"args": [
-    					{
-      						"type": 'Integer',
-      						"value": parseInt(this.token_id, 10)
-      					}
-  					],
-  					"network": "TestNet"}
-				 	smartEcoRouter.invokeRead(invokeRequest)
-					.then(function(r) {
-						var hex = r["stack"][0]["value"]
-    					var str = '';
-    					for (var i = 0; (i < hex.length && hex.substr(i, 2) !== '00'); i += 2)
-        					str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
-						console.log(str)
-						self.image_url = str
-						console.log(this.image_url)
-					})
-					.catch(function(e) {
-						console.log(e)
-					}) 
-			}
-		}
-	});
-</script>>
 
 <footer class="footer footer-dark bg-gradient-primary footer-rotate mt-5">
 	<div class="container">
@@ -117,6 +122,78 @@
 		</div>
 	</div>
 </footer>
+
+<script type="text/javascript">
+	var app = new Vue({
+		el: '#app',
+		data: {
+			contract_hash:"ef26427f9eaeed31c57884dbbc2bda5de7b5dab8",
+			token_id: 0,
+			image_url:"",
+			token_urls:[]
+		}, 
+		methods:{
+			getUrlForToken(){
+				var self = this;
+				smartEcoRouter = new smartEco.SmartEcoRouter()
+				smartEcoRouter.start()
+				var invokeRequest = {
+					"scriptHash": this.contract_hash,
+  					"operation": "uri",
+  					"args": [
+    					{
+      						"type": 'Integer',
+      						"value": parseInt(this.token_id, 10)
+      					}
+  					],
+  					"network": "TestNet"}
+				 	smartEcoRouter.invokeRead(invokeRequest)
+					.then(function(r) {
+						var hex = r["stack"][0]["value"]
+    					var str = '';
+    					for (var i = 0; (i < hex.length && hex.substr(i, 2) !== '00'); i += 2)
+        					str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+						console.log(str)
+						self.image_url = str
+						console.log(this.image_url)
+					})
+					.catch(function(e) {
+						console.log(e)
+					})
+					 
+			}, loadAllTokens() {
+				var self = this
+				smartEcoRouter = new smartEco.SmartEcoRouter()
+				smartEcoRouter.start()
+				for (i=1; i<4; i++) {
+					var invokeRequest = {
+					"scriptHash": this.contract_hash,
+  					"operation": "uri",
+  					"args": [
+    					{
+      						"type": 'Integer',
+      						"value": parseInt(i, 10)
+      					}
+  					],
+  					"network": "TestNet"}
+				 	smartEcoRouter.invokeRead(invokeRequest)
+					.then(function(r) {
+						var hex = r["stack"][0]["value"]
+    					var str = '';
+    					for (var i = 0; (i < hex.length && hex.substr(i, 2) !== '00'); i += 2)
+        					str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+						console.log(str)
+						self.token_urls.push(str)
+						console.log(self.token_urls)
+					})
+					.catch(function(e) {
+						console.log(e)
+					})	
+				}
+			}
+		}
+	});
+</script>>
 	<script src="assets/vendor/jquery/dist/jquery.min.js"></script>
 	<script src="assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 	<script src="assets/js/theme.js"></script>
