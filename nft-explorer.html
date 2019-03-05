@@ -38,9 +38,9 @@
 		<div class="col col-md-6 mx-auto">
 			<h6>Find NFT Tokens</h6>
 			<div class="input-group mb-3">
-				<input v-model="contract_hash" placeholder="Contract or User Address" aria-label="NEO address" aria-describedby="basic-addon2" class="form-control">
+				<input v-model="search_value" placeholder="Contract or User Address" aria-label="NEO address" aria-describedby="basic-addon2" class="form-control">
 				<div class="input-group-append">
-					<button type="button" v-on:click="loadAllTokens" class="btn btn-primary btn-o3-primary">
+					<button type="button" v-on:click="searchForValue" class="btn btn-primary btn-o3-primary">
 						Search
 					</button>
 				</div>
@@ -123,15 +123,18 @@
 	var app = new Vue({
 		el: '#app',
 		data: {
-			contract_hash:"ef26427f9eaeed31c57884dbbc2bda5de7b5dab8",
+			search_value:"ef26427f9eaeed31c57884dbbc2bda5de7b5dab8",
+			contract_hash: "",
 			token_id: 0,
 			image_url:"",
+			//Known Contracts should probably be parsed out into a server side method
+			known_contracts: ["ef26427f9eaeed31c57884dbbc2bda5de7b5dab8"],
 			tokens:[]
 		}, 
 		methods:{
-			buildURIRequest(id) {
+			buildURIRequest(id, contract) {
 				var uriRequest = {
-						"scriptHash": this.contract_hash,
+						"scriptHash": contract,
   						"operation": "uri",
   						"args": [
     						{
@@ -144,10 +147,10 @@
 				return uriRequest
 			},
 
-			buildOwnerOfRequest(id) {
+			buildOwnerOfRequest(id, contract) {
 				console.log(id)
 				var ownerRequest = {
-						"scriptHash": this.contract_hash,
+						"scriptHash": contract,
 						"operation": "ownerOf",
 						"args": [
 							{
@@ -160,36 +163,126 @@
 				return ownerRequest
 			},
 
+			buildTotalSupplyRequest() {
+				var totalSupplyRequest = {
+						"scriptHash": this.contract_hash,
+						"operation": "totalSupply",
+						"args": [],
+						"network": "TestNet"
+					}
+				return totalSupplyRequest
+			},
+			
+			buildGetTokensOfOwnerRequest(scriptHash) {
+				var tokensOfOwnerRequest = {
+					"scriptHash": scriptHash,
+						"operation": "tokensOfOwner",
+						"args": [
+							{
+								"type": 'ByteArray',
+								"value": Neon.u.reverseHex(Neon.wallet.getScriptHashFromAddress("AafQxV6wQhtGYGYFboEyBjw3eMYNtBFW8J"))
+							}, {
+								"type": "Integer",
+								"value": 1
+							}
+						],
+					"network": "TestNet"
+				}
+				return tokensOfOwnerRequest
+			},
+
 			convertHexToString(hex) {
     			var str = '';
     			for (var i = 0; (i < hex.length && hex.substr(i, 2) !== '00'); i += 2)
         			str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
     			return str;
 			},
-
-			loadAllTokens() {
+			
+			loadAllTokensForAddress() {
 				var self = this
 				smartEcoRouter = new smartEco.SmartEcoRouter()
 				smartEcoRouter.start()
-				for (i=1; i<4; i++) {
-					var uriRequest = self.buildURIRequest(i)
-					var ownerRequest = self.buildOwnerOfRequest(i)	
 
-					Promise.all([smartEcoRouter.invokeRead(uriRequest), smartEcoRouter.invokeRead(ownerRequest), Promise.resolve(i)]).then(function(values) {
-						var uri = self.convertHexToString(values[0]["stack"][0]["value"])
-						var owner = self.convertHexToString(values[1]["stack"][0]["value"])
-						console.log(values[2])
-						self.tokens.push ({
-								"token_id": values[2],
-								"uri": uri,
-								"owner": Neon.wallet.getAddressFromScriptHash(Neon.u.reverseHex(values[1]["stack"][0]["value"]))
+				var promises = []
+				console.log(this.known_contracts)
+				this.tokens = []
+				for (var i = 0; i < this.known_contracts.length; i++) {
+					var req = self.buildGetTokensOfOwnerRequest(self.known_contracts[i])
+					Promise.all([smartEcoRouter.invokeRead(req), Promise.resolve(self.known_contracts[i])])
+						.then(function(values) {
+							r = values[0]
+							contract = values[1]
+							var deserialized = Neon.sc.StackItem.deserialize(r["stack"][0]["value"])
+							for (i=0; i< deserialized["value"].length; i++) {
+								console.log(deserialized["value"][i]["value"])
+								var id = parseInt(deserialized["value"][i]["value"]["value"], 16)
+								var uriRequest = self.buildURIRequest(id, contract)
+								var ownerRequest = self.buildOwnerOfRequest(id, contract)	
+
+								Promise.all([smartEcoRouter.invokeRead(uriRequest), smartEcoRouter.invokeRead(ownerRequest), Promise.resolve(id)])
+									.then(function(values) {
+										var uri = self.convertHexToString(values[0]["stack"][0]["value"])
+										var owner = self.convertHexToString(values[1]["stack"][0]["value"])
+										console.log(values[2])
+										self.tokens.push ({
+											"token_id": values[2],
+											"uri": uri,
+											"owner": Neon.wallet.getAddressFromScriptHash(Neon.u.reverseHex(values[1]["stack"][0]["value"]))
+										})
+									})
+									.catch(function(e) {
+										console.log(e)
+									})
+							}
 						})
+						.catch(function(e) {
+							console.log(e)
+						})
+
+				}
+			},
+
+			loadAllTokensForContract() {
+				var self = this
+				smartEcoRouter = new smartEco.SmartEcoRouter()
+				smartEcoRouter.start()
+				this.tokens = []
+				smartEcoRouter.invokeRead(self.buildTotalSupplyRequest())
+					.then(function(r) {
+						var totalSupply = parseInt(r["stack"][0]["value"], 16)
+						for (i=1; i< totalSupply + 1; i++) {
+							var uriRequest = self.buildURIRequest(i, self.contract_hash)
+							var ownerRequest = self.buildOwnerOfRequest(i, self.contract_hash)	
+
+							Promise.all([smartEcoRouter.invokeRead(uriRequest), smartEcoRouter.invokeRead(ownerRequest), Promise.resolve(i)])
+								.then(function(values) {
+									var uri = self.convertHexToString(values[0]["stack"][0]["value"])
+									var owner = self.convertHexToString(values[1]["stack"][0]["value"])
+									console.log(values[2])
+									self.tokens.push ({
+										"token_id": values[2],
+										"uri": uri,
+										"owner": Neon.wallet.getAddressFromScriptHash(Neon.u.reverseHex(values[1]["stack"][0]["value"]))
+									})
+								})
+								.catch(function(e) {
+									console.log(e)
+								})
+						}
 					})
 					.catch(function(e) {
 						console.log(e)
 					})
+				},
+			searchForValue() {
+				if (Neon.wallet.isAddress(this.search_value)) {
+					this.address = this.search_value
+					this.loadAllTokensForAddress()
+				} else {
+					this.contract_hash = this.search_value
+					this.loadAllTokensForContract()
 				}
-			}
+			},
 		}
 	});
 </script>>
