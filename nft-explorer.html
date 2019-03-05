@@ -16,6 +16,7 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/smarteco@1.0.4/lib/smartEco.min.js"></script>
 	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue"></script>
 	<script type="text/javascript" src="https://unpkg.com/axios/dist/axios.min.js"></script>
+	<script src="https://unpkg.com/@cityofzion/neon-js"></script>
 </head>
 <body>
 	<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
@@ -33,20 +34,31 @@
 	</nav>
 
 	<div id="app">
+	<div class="row mt-5">
+		<div class="col col-md-6 mx-auto">
+			<h6>Find NFT Tokens</h6>
+			<div class="input-group mb-3">
+				<input v-model="contract_hash" placeholder="Contract or User Address" aria-label="NEO address" aria-describedby="basic-addon2" class="form-control">
+				<div class="input-group-append">
+					<button type="button" v-on:click="loadAllTokens" class="btn btn-primary btn-o3-primary">
+						Search
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
 	<section class="container">
-
-
 		<div class="row row-grid mt-lg d-lg-flex">
-			<div class="col col-lg-6 mb-lg-4" v-for="nft in token_urls">
+			<div class="col col-lg-6 mb-lg-4" v-for="nft in tokens">
 				<div class="card shadow">
 					<div class="card-body">
 						<div class="d-flex align-items-start ">
 							<div class="">
-								<img v-bind:src="nft" height="44px" />
+								<img v-bind:src="nft.uri" height="44px" />
 							</div>
 							<div class="icon-text px-4">
-								<h5 class="">OWNER</h5>
-								<div class="mb-0">TOKEN ID</div>
+								<h5 class="">Owner: {{ nft.owner }}</h5>
+								<div class="mb-0">Token ID: {{nft.token_id}} </div>
 							</div>
 						</div>
 						
@@ -57,23 +69,7 @@
 				</div>
 			</div>
 		</div>  
-
-
 	</section>
-
-
-
-
-
-		<h1>NFT Explorer</h1>
-		Contract Hash:<br>
-  		<input v-model="contract_hash" >
-  		<br>
- 		Token ID:<br>
-  		<input v-model="token_id">
-  		<br><br>
-  		<button v-on:click="loadAllTokens">Submit</button>
-		<img v-bind:src="image_url"/>
 </div>
 
 <footer class="footer footer-dark bg-gradient-primary footer-rotate mt-5">
@@ -130,65 +126,68 @@
 			contract_hash:"ef26427f9eaeed31c57884dbbc2bda5de7b5dab8",
 			token_id: 0,
 			image_url:"",
-			token_urls:[]
+			tokens:[]
 		}, 
 		methods:{
-			getUrlForToken(){
-				var self = this;
-				smartEcoRouter = new smartEco.SmartEcoRouter()
-				smartEcoRouter.start()
-				var invokeRequest = {
-					"scriptHash": this.contract_hash,
-  					"operation": "uri",
-  					"args": [
-    					{
-      						"type": 'Integer',
-      						"value": parseInt(this.token_id, 10)
-      					}
-  					],
-  					"network": "TestNet"}
-				 	smartEcoRouter.invokeRead(invokeRequest)
-					.then(function(r) {
-						var hex = r["stack"][0]["value"]
-    					var str = '';
-    					for (var i = 0; (i < hex.length && hex.substr(i, 2) !== '00'); i += 2)
-        					str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
-						console.log(str)
-						self.image_url = str
-						console.log(this.image_url)
-					})
-					.catch(function(e) {
-						console.log(e)
-					})
-					 
-			}, loadAllTokens() {
+			buildURIRequest(id) {
+				var uriRequest = {
+						"scriptHash": this.contract_hash,
+  						"operation": "uri",
+  						"args": [
+    						{
+      							"type": 'Integer',
+      							"value": parseInt(id, 10)
+      						}
+  						],
+  						"network": "TestNet"
+					}
+				return uriRequest
+			},
+
+			buildOwnerOfRequest(id) {
+				console.log(id)
+				var ownerRequest = {
+						"scriptHash": this.contract_hash,
+						"operation": "ownerOf",
+						"args": [
+							{
+								"type": 'Integer',
+								"value": parseInt(id, 10)
+							}
+						],
+						"network": "TestNet"
+					}
+				return ownerRequest
+			},
+
+			convertHexToString(hex) {
+    			var str = '';
+    			for (var i = 0; (i < hex.length && hex.substr(i, 2) !== '00'); i += 2)
+        			str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+    			return str;
+			},
+
+			loadAllTokens() {
 				var self = this
 				smartEcoRouter = new smartEco.SmartEcoRouter()
 				smartEcoRouter.start()
 				for (i=1; i<4; i++) {
-					var invokeRequest = {
-					"scriptHash": this.contract_hash,
-  					"operation": "uri",
-  					"args": [
-    					{
-      						"type": 'Integer',
-      						"value": parseInt(i, 10)
-      					}
-  					],
-  					"network": "TestNet"}
-				 	smartEcoRouter.invokeRead(invokeRequest)
-					.then(function(r) {
-						var hex = r["stack"][0]["value"]
-    					var str = '';
-    					for (var i = 0; (i < hex.length && hex.substr(i, 2) !== '00'); i += 2)
-        					str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
-						console.log(str)
-						self.token_urls.push(str)
-						console.log(self.token_urls)
+					var uriRequest = self.buildURIRequest(i)
+					var ownerRequest = self.buildOwnerOfRequest(i)	
+
+					Promise.all([smartEcoRouter.invokeRead(uriRequest), smartEcoRouter.invokeRead(ownerRequest), Promise.resolve(i)]).then(function(values) {
+						var uri = self.convertHexToString(values[0]["stack"][0]["value"])
+						var owner = self.convertHexToString(values[1]["stack"][0]["value"])
+						console.log(values[2])
+						self.tokens.push ({
+								"token_id": values[2],
+								"uri": uri,
+								"owner": Neon.wallet.getAddressFromScriptHash(Neon.u.reverseHex(values[1]["stack"][0]["value"]))
+						})
 					})
 					.catch(function(e) {
 						console.log(e)
-					})	
+					})
 				}
 			}
 		}
