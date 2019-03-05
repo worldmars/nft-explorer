@@ -125,6 +125,7 @@
 		data: {
 			search_value:"ef26427f9eaeed31c57884dbbc2bda5de7b5dab8",
 			contract_hash: "",
+			address: "",
 			token_id: 0,
 			image_url:"",
 			//Known Contracts should probably be parsed out into a server side method
@@ -180,7 +181,7 @@
 						"args": [
 							{
 								"type": 'ByteArray',
-								"value": Neon.u.reverseHex(Neon.wallet.getScriptHashFromAddress("AafQxV6wQhtGYGYFboEyBjw3eMYNtBFW8J"))
+								"value": Neon.u.reverseHex(Neon.wallet.getScriptHashFromAddress(this.address))
 							}, {
 								"type": "Integer",
 								"value": 1
