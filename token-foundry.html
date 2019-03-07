@@ -1,0 +1,228 @@
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>NFT</title>
+	<link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
+	<link type="text/css" href="assets/css/theme.css" rel="stylesheet">
+	<style type="text/css">
+	* {
+		font-family: 'Nunito', sans-serif;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+	}
+</style>
+
+
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/smarteco@1.0.6/lib/smartEco.min.js"></script>
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue"></script>
+	<script type="text/javascript" src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/@cityofzion/neon-js"></script>
+</head>
+<body>
+	<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+		<a class="navbar-brand" href="#"><img src="https://cdn.o3.network/logo/logo-dark.png" srcset="https://cdn.o3.network/logo/logo-dark@2x.png 2x" height="30" /></a>
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar_example_1" aria-controls="navbar_example_1" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<div class="collapse navbar-collapse" id="navbar_example_1">
+			<ul class="navbar-nav ml-auto">
+				<li class="nav-item">
+					<a class="nav-link" href="./nft-explorer.html">NFT Explorer</a>
+				</li>
+				<li class="nav-item active">
+					<a class="nav-link" href="/token-foundry.html">Token Foundry</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="https://o3.network" target="_blank">Download O3</a>
+				</li>
+			</ul>
+		</div>
+    </nav>
+    
+    <div id="app">
+        <div class="row mt-5">
+            <div class="col col-md-6 mx-auto">
+                <h6>Select An NFT Contract</h6>
+                <div class="input-group mb-3">
+                    <input v-model="contract_hash" placeholder="URI for image" aria-label="NEO address" aria-describedby="basic-addon2" class="form-control">
+                    <div class="input-group-append">
+                        <button type="button" v-on:click="validateContract" class="btn btn-primary btn-o3-primary">
+                            Validate
+                        </button>
+                    </div>
+                </div>
+                <div class="alert alert-danger" v-if="contract_is_nft == false">This is an invalid NFT contract</div>
+                <div class="alert alert-success" v-if="contract_is_nft">This a a valid NFT contract</div>
+            </div>
+        </div>
+
+        <div class="row mt-5">
+            <div class="col col-md-6 mx-auto">
+                <h6>Upload Resource</h6>
+                <div class="input-group mb-3">
+                    <input v-model="to_search_uri" placeholder="URI for image" aria-label="NEO address" aria-describedby="basic-addon2" class="form-control">
+                    <div class="input-group-append">
+                        <button type="button" v-on:click="displayURI" class="btn btn-primary btn-o3-primary">
+                            Upload
+                        </button>
+                    </div>
+                </div>
+                <img v-bind:src="loaded_uri" height="100px"/>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col col-md-6 mx-auto">
+                <h6>Select The Recipient Address</h6>
+                <div class="input-group mb-3">
+                    <input v-model="recipient" placeholder="Recipient Address" aria-label="NEO address" aria-describedby="basic-addon2" class="form-control">
+                </div>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <button type="button" v-on:click="mintToken" class="btn btn-primary btn-o3-primary">
+                Mint Token
+            </button>
+        </div>        
+    </div>
+    <footer class="footer footer-dark bg-gradient-primary footer-rotate mt-5">
+        <div class="container">
+            <div class="row pt-md">
+                <div class="col-lg-4 mb-5 mb-lg-0">
+                    <a href="/">
+                        <img src="https://cdn.o3.network/logo/logo-dark.png" srcset="https://cdn.o3.network/logo/logo-dark@2x.png 2x" alt="Footer logo" style="height: 40px;">
+                    </a>
+                    <p class="text-sm mt-2">Your gateway to the Smart Economy</p>
+                </div>
+                <div class="col-lg-2 col-6 col-sm-4 ml-lg-auto mb-5 mb-lg-0">
+                    <h6 class="heading mb-3">O3</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="https://itunes.apple.com/app/id1336781023">iOS</a>
+                        </li>
+                        <li><a href="https://play.google.com/store/apps/details?id=network.o3.o3wallet">Android</a>
+                        </li>
+                        <li><a href="https://itunes.apple.com/us/app/o3/id1421086700">macOS</a>
+                        </li>
+                        <li><a href="https://www.microsoft.com/store/apps/9P6FJT4FB4DJ">Windows</a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="col-lg-2 col-sm-4 mb-5 mb-lg-0">
+                    <h6 class="heading mb-3">Company</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="https://o3.network">Home</a>
+                        </li>
+                        <li><a href="https://o3.network/team/">Team</a>
+                        </li>
+                        <li><a href="https://community.o3.network/">Community</a>
+                        </li>
+                        <li><a href="mailto:support@o3.network">Support</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row align-items-center justify-content-md-between py-4 mt-4 delimiter-top">
+                <div class="col-md-6">
+                    <div class="copyright text-sm font-weight-bold text-center text-md-left">
+                        &copy; 2019 <a href="https://o3.network/" class="font-weight-bold" target="_blank">O3 Labs Inc</a>. All rights reserved.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script type="text/javascript">
+        var app = new Vue({
+            el: '#app',
+            data: {
+                "to_search_uri": "https://media.giphy.com/media/Wyt6sLEjKjaFjzybth/giphy.gif",
+                "loaded_uri": "",
+                "contract_hash": "ef26427f9eaeed31c57884dbbc2bda5de7b5dab8",
+                "contract_is_nft": false,
+                "recipient": "AafQxV6wQhtGYGYFboEyBjw3eMYNtBFW8J"
+            }, 
+            methods:{
+                convertHexToString(hex) {
+    			var str = '';
+    			for (var i = 0; (i < hex.length && hex.substr(i, 2) !== '00'); i += 2)
+        			str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+                return str;
+                },
+                displayURI() {
+                    this.loaded_uri = this.to_search_uri
+                }, 
+                buildSupportedStandardsRequest() {
+                    var supportedStandardsRequest = { "scriptHash": this.contract_hash,
+						"operation": "supportedStandards",
+						"args": []  ,
+					    "network": "TestNet"
+                    }
+                    console.log(supportedStandardsRequest)
+				    return supportedStandardsRequest
+                },
+                buildMintTokensRequest() {
+                    var mintTokensRequest = { "scriptHash": this.contract_hash,
+                        "operation": "mintToken",
+                        "args": [
+		                    {"type": "ByteArray", "value": Neon.u.reverseHex(Neon.wallet.getScriptHashFromAddress(this.recipient))},
+		                    {"type": "ByteArray", "value": "00"},
+		                    {"type": "ByteArray", "value": Neon.u.str2hexstring(this.loaded_uri)}
+	                    ],
+                        "network": "TestNet",
+                        "fee": "0"
+                    } 
+                    return mintTokensRequest
+                },
+                validateContract() {
+                    console.log("attempting contract validation")
+                    var self = this
+                    if (this.contract_hash.length != 40) {
+                        self.contract_is_nft = false
+                    } else {
+                        smartEcoRouter = new smartEco.SmartEcoRouter()
+                        smartEcoRouter.start()
+                        smartEcoRouter.invokeRead(self.buildSupportedStandardsRequest())
+                        .then(function(r) {
+                            var deserialized = Neon.sc.StackItem.deserialize(r["stack"][0]["value"])
+                            var supportedStandards = []
+                            for (i = 0; i < deserialized["value"].length; i++) {
+                                supportedStandards.push(self.convertHexToString(deserialized["value"][i]["value"]))
+                            }
+                            if (supportedStandards.includes("NEP-10")) {
+                                self.contract_is_nft = true
+                            }
+                        })
+                        .catch(function(e) {
+                            console.log(e)
+                            self.contract_is_nft = false
+                        })                        
+                    }
+                },
+                mintToken() {
+                    var self = this
+                    smartEcoRouter = new smartEco.SmartEcoRouter()
+                    smartEcoRouter.start()
+                    var r = self.buildMintTokensRequest()
+                    console.log(r)
+                    smartEcoRouter.invoke(r)
+                    .then(function(r) {
+                        console.log(r)
+                    })
+                    .catch(function(e) {
+                        console.log(e)
+                    })
+                }
+            }
+        })
+    </script>
+    <script src="assets/vendor/jquery/dist/jquery.min.js"></script>
+    <script src="assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/theme.js"></script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-128562956-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-128562956-1');
+    </script>
+</body>
