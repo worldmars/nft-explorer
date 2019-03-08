@@ -55,12 +55,12 @@
 	</div>
 	<section class="container">
 		<div class="row row-grid mt-lg d-lg-flex">
-			<div class="col col-lg-4 mb-lg-4" v-for="nft in tokens">
+			<div class="col-sm-6 col-lg-4 mb-lg-4" v-for="nft in tokens">
 				<div class="card shadow">
 					<div class="card shadow">
 							<div class="card-body">
 								<div class="mb-0">Token ID: {{nft.token_id}} </div>
-								<img width="100%" padding-top="100%" class="rounded" v-bind:src=nft.uri>
+								<img width="100%" height="250px;" padding-top="100%" class="rounded" style="object-fit: cover;" v-bind:src=nft.uri>
 								<div class="mb-0">Owner: {{ nft.owner }}</div>
 							</div>
 							<div class="card-footer">
