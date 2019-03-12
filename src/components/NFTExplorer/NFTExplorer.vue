@@ -73,7 +73,8 @@
 				image_url:"",
 				totalSupply: 0,
 				//Known Contracts should probably be parsed out into a server side method
-				known_contracts: ["ef26427f9eaeed31c57884dbbc2bda5de7b5dab8"],
+				known_contracts: ["ef26427f9eaeed31c57884dbbc2bda5de7b5dab8",
+													"5b9c51062ccd3c99346febb4fda31dbe506e92d9"],
 				tokens:[]
 			}
 		}, 

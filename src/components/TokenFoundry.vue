@@ -1,22 +1,33 @@
 <template>
 <div id="foundry">
-    <div class="row mt-5">
+    <div class="row mt-5 mb-3">
+		<div class="col-6 mx-auto landing-info">
+			Welcome to O3 Token Foundry! Here you can mint yourself a unique NFT on the O3 NFT contract.
+            The goal of the Token Foundary is to give a simple way to get started with NFTs and start building concepts based around unique collectible tokens.
+		</div>
+	</div>
+
+    <div class="row">
         <div class="col col-md-6 mx-auto">
             <h6>Select An NFT Contract</h6>
             <div class="input-group mb-3">
-                <input v-model="contract_hash" placeholder="URI for image" aria-label="NEO address" aria-describedby="basic-addon2" class="form-control">
+                <input class="form-control" v-bind:class= "{'is-valid': contract_is_nft, 'is-invalid': contract_is_nft == false}" v-model="contract_hash" placeholder="URI for image" aria-label="NEO address" aria-describedby="basic-addon2">
                 <div class="input-group-append">
                     <button type="button" v-on:click="validateContract" class="btn btn-primary btn-o3-primary">
                         Validate
                     </button>
                 </div>
+                <div class="invalid-feedback">
+                    Please provide a valid contract
+                </div>
+                <div class="valid-feedback">
+                    This is a valid contract
+                </div>
             </div>
-            <div class="alert alert-danger" v-if="contract_is_nft == false">This is an invalid NFT contract</div>
-            <div class="alert alert-success" v-if="contract_is_nft">This a a valid NFT contract</div>
         </div>
     </div>
 
-    <div class="row mt-5">
+    <div class="row">
         <div class="col col-md-6 mx-auto">
             <h6>Upload Resource</h6>
             <div class="input-group mb-3">
@@ -26,35 +37,72 @@
                         Upload
                     </button>
                 </div>
+                <div class="invalid-feedback">
+                    Please provide a valid uri
+                </div>
+                <div class="valid-feedback">
+                    This is an invalid uri
+                </div>
             </div>
-            <img v-bind:src="loaded_uri" height="100px"/>
         </div>
     </div>
-    <div class="row mt-5">
+    
+    <div class="row mb-3">
         <div class="col col-md-6 mx-auto">
             <h6>Select The Recipient Address</h6>
             <div class="input-group mb-3">
                 <input v-model="recipient" placeholder="Recipient Address" aria-label="NEO address" aria-describedby="basic-addon2" class="form-control">
             </div>
+            <div class="invalid-feedback">
+                    Please provide a valid uri
+                </div>
+                <div class="valid-feedback">
+                    This is an invalid uri
+            </div>
         </div>
     </div>
-    <div class="row mt-5">
+
+    <div class="col-sm-6 col-lg-4 mb-lg-4 mx-auto">
+        <NFTCard  :token_id="100" :owner="recipient" :uri="loaded_uri" :contract="contract_hash"></NFTCard>
+    </div>
+
+    <div class="row justify-content-center mb-3">
+        <div class="custom-control custom-checkbox">
+            <input type="checkbox" class="custom-control-input" id="customCheck1">
+            <label class="custom-control-label" for="customCheck1">I agree to the <a href="https://www.o3.network">terms and conditions</a></label>
+        </div>
+    </div>
+
+    <div class="row justify-content-center mb-3">
         <button type="button" v-on:click="mintToken" class="btn btn-primary btn-o3-primary">
             Mint Token
         </button>
     </div>        
+    <div class="row col-lg-8">
+        <div class="alert alert-success" v-if="minted" role="alert">
+        Your token has been successfully minted. It may take up to five minutes for it appear. Come back and check it out in the explorer!
+        </div>
+    </div>
+
+</div>
 </div>
 </template>
 
 <script>
+import NFTCard from './NFTExplorer/NFTCard.vue'
+
 export default {
+    components: {
+        NFTCard
+    },
     data: function () {
         return {
             "to_search_uri": "https://media.giphy.com/media/Wyt6sLEjKjaFjzybth/giphy.gif",
-            "loaded_uri": "",
+            "loaded_uri": "https://media.giphy.com/media/Wyt6sLEjKjaFjzybth/giphy.gif",
             "contract_hash": "5b9c51062ccd3c99346febb4fda31dbe506e92d9",
-            "contract_is_nft": false,
-            "recipient": "AafQxV6wQhtGYGYFboEyBjw3eMYNtBFW8J"
+            "contract_is_nft": true,
+            "recipient": "AafQxV6wQhtGYGYFboEyBjw3eMYNtBFW8J", 
+            "minted": false
         }
     }, 
     methods:{
@@ -122,7 +170,7 @@ export default {
             console.log(r)
             smartEcoRouter.invoke(r)
             .then(function(r) {
-                console.log(r)
+                self.minted = true
             })
             .catch(function(e) {
                 console.log(e)
@@ -131,3 +179,10 @@ export default {
     }
 }
 </script>
+
+<style>
+ .landing-info {
+	color: #000000;
+	font-size: 12px;
+	text-align: center;
+}
