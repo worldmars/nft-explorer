@@ -1,0 +1,349 @@
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>NFT</title>
+	<link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
+	<link type="text/css" href="../src/assets/css/theme.css" rel="stylesheet">
+	<style type="text/css">
+	* {
+		font-family: 'Nunito', sans-serif;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+	}
+</style>
+
+
+  
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue"></script>
+	<!-- <--- <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/smarteco@1.0.6/lib/smartEco.min.js"></script> ---> -->
+	<script type="text/javascript" src="https://unpkg.com/axios/dist/axios.min.js"></script>
+	<script src="https://unpkg.com/@cityofzion/neon-js"></script>
+</head>
+<body>
+	<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+		<a class="navbar-brand" href="#"><img src="https://cdn.o3.network/logo/logo-dark.png" srcset="https://cdn.o3.network/logo/logo-dark@2x.png 2x" height="30" /></a>
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar_example_1" aria-controls="navbar_example_1" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<div class="collapse navbar-collapse" id="navbar_example_1">
+			<ul class="navbar-nav ml-auto">
+				<li class="nav-item active">
+					<a class="nav-link" href="./nft-explorer.html">NFT Explorer</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="./token-foundry.html">Token Foundry</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="https://o3.network" target="_blank">Download O3</a>
+				</li>
+			</ul>
+		</div>
+	</nav>
+
+	<div id="app">
+	<div class="row mt-5">
+		<div class="col col-md-6 mx-auto">
+			<h6>Find NFT Tokens</h6>
+			<div class="input-group mb-3">
+				<input v-model="search_value" placeholder="Contract or User Address" aria-label="NEO address" aria-describedby="basic-addon2" class="form-control">
+				<div class="input-group-append">
+					<button type="button" v-on:click="searchForValue" class="btn btn-primary btn-o3-primary">
+						Search
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<section class="container">
+		<div class="row row-grid mt-lg d-lg-flex">
+			<div class="col-sm-6 col-lg-4 mb-lg-4" v-for="nft in tokens">
+				<div class="card shadow">
+					<div class="card shadow">
+							<div class="card-body">
+								<div class="mb-0">Token ID: {{nft.token_id}} </div>
+								<img width="100%" height="250px;" padding-top="100%" class="rounded" style="object-fit: cover;" v-bind:src=nft.uri>
+								<div class="mb-0">Owner: {{ nft.owner }}</div>
+							</div>
+							<div class="card-footer">
+								Footer Goes Here
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>  
+	</section>
+</div>
+
+<div class="d-flex justify-content-center">
+	<nav aria-label="Token Paging">
+		<ul class="pagination">
+			<li class="page-item"><a class="page-link" href="#">Previous</a></li>
+			<li class="page-item"><a class="page-link" href="#">1</a></li>
+			<li class="page-item"><a class="page-link" href="#">2</a></li>
+			<li class="page-item"><a class="page-link" href="#">3</a></li>
+			<li class="page-item"><a class="page-link" href="#">Next</a></li>
+		</ul>
+	</nav>
+</div>
+
+<section class="slice slice-lg">
+	<div class="container">
+	  <div class="row">
+		<div class="col-lg-12">
+		  <div class="card bg-gradient-dark shadow hover-shadow-lg border-0 position-relative zindex-100">
+			<div class="card-body py-5">
+			  <div class="d-flex align-items-start mb-3">
+				<div class="icon">
+				  <i class="fas fa-file-alt text-white"></i>
+				</div>
+				<div class="icon-text">
+					<h3 class="text-white h4">Building something awesome? Integrate with O3!</h3>
+				  	<p class="text-white mb-0">With O3's dAPI, it's so simple to hook your app up to the blockchain. 
+					  O3 will handle all the wallet and chain interaction heavy lifting, so you can focus on making your app awesome
+					</p>
+				</div>
+			  </div>
+			  <div class="d-flex justify-content-center">
+				<button type="button" v-on:click="searchForValue" class="btn btn-primary btn-o3-primary">
+						Get in touch with us today
+				</button>
+				</div>
+			</div>
+		  </div>
+		</div>
+	  </div>
+	</div>
+  </section>
+
+  
+  <footer id="footer-main">
+    <div class="footer footer-dark bg-gradient-primary footer-rotate">
+	<div class="container">
+		<div class="row pt-md">
+			<div class="col-lg-4 mb-5 mb-lg-0">
+				<a href="/">
+					<img src="https://cdn.o3.network/logo/logo-dark.png" srcset="https://cdn.o3.network/logo/logo-dark@2x.png 2x" alt="Footer logo" style="height: 40px;">
+				</a>
+				<p class="text-sm mt-2">Your gateway to the Smart Economy</p>
+			</div>
+			<div class="col-lg-2 col-6 col-sm-4 ml-lg-auto mb-5 mb-lg-0">
+				<h6 class="heading mb-3">O3</h6>
+				<ul class="list-unstyled">
+					<li><a href="https://itunes.apple.com/app/id1336781023">iOS</a>
+					</li>
+					<li><a href="https://play.google.com/store/apps/details?id=network.o3.o3wallet">Android</a>
+					</li>
+					<li><a href="https://itunes.apple.com/us/app/o3/id1421086700">macOS</a>
+					</li>
+					<li><a href="https://www.microsoft.com/store/apps/9P6FJT4FB4DJ">Windows</a>
+					</li>
+				</ul>
+			</div>
+		 
+			<div class="col-lg-2 col-sm-4 mb-5 mb-lg-0">
+				<h6 class="heading mb-3">Company</h6>
+				<ul class="list-unstyled">
+					<li><a href="https://o3.network">Home</a>
+					</li>
+					<li><a href="https://o3.network/team/">Team</a>
+					</li>
+					<li><a href="https://community.o3.network/">Community</a>
+					</li>
+					<li><a href="mailto:support@o3.network">Support</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+		<div class="row align-items-center justify-content-md-between py-4 mt-4 delimiter-top">
+			<div class="col-md-6">
+				<div class="copyright text-sm font-weight-bold text-center text-md-left">
+					&copy; 2019 <a href="https://o3.network/" class="font-weight-bold" target="_blank">O3 Labs Inc</a>. All rights reserved.
+				</div>
+			</div>
+		</div>
+	</div>
+	</div>
+</footer>
+
+<script type="text/javascript">
+	var app = new Vue({
+		el: '#app',
+		data: {
+			search_value:"ef26427f9eaeed31c57884dbbc2bda5de7b5dab8",
+			contract_hash: "",
+			address: "",
+			token_id: 0,
+			image_url:"",
+			//Known Contracts should probably be parsed out into a server side method
+			known_contracts: ["ef26427f9eaeed31c57884dbbc2bda5de7b5dab8",
+												"5b9c51062ccd3c99346febb4fda31dbe506e92d9"],
+			tokens:[]
+		}, 
+		methods:{
+			buildURIRequest(id, contract) {
+				var uriRequest = {
+						"scriptHash": contract,
+  						"operation": "uri",
+  						"args": [
+    						{
+      							"type": 'Integer',
+      							"value": parseInt(id, 10)
+      						}
+  						],
+  						"network": "TestNet"
+					}
+				return uriRequest
+			},
+
+			buildOwnerOfRequest(id, contract) {
+				console.log(id)
+				var ownerRequest = {
+						"scriptHash": contract,
+						"operation": "ownerOf",
+						"args": [
+							{
+								"type": 'Integer',
+								"value": parseInt(id, 10)
+							}
+						],
+						"network": "TestNet"
+					}
+				return ownerRequest
+			},
+
+			buildTotalSupplyRequest() {
+				var totalSupplyRequest = {
+						"scriptHash": this.contract_hash,
+						"operation": "totalSupply",
+						"args": [],
+						"network": "TestNet"
+					}
+				return totalSupplyRequest
+			},
+			
+			buildGetTokensOfOwnerRequest(scriptHash) {
+				var tokensOfOwnerRequest = {
+					"scriptHash": scriptHash,
+						"operation": "tokensOfOwner",
+						"args": [
+							{
+								"type": 'ByteArray',
+								"value": Neon.u.reverseHex(Neon.wallet.getScriptHashFromAddress(this.address))
+							}, {
+								"type": "Integer",
+								"value": 1
+							}
+						],
+					"network": "TestNet"
+				}
+				return tokensOfOwnerRequest
+			},
+
+			convertHexToString(hex) {
+    			var str = '';
+    			for (var i = 0; (i < hex.length && hex.substr(i, 2) !== '00'); i += 2)
+        			str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+    			return str;
+			},
+			
+			loadAllTokensForAddress() {
+				var self = this
+				smartEcoRouter = new smartEco.SmartEcoRouter()
+				smartEcoRouter.start()
+
+				var promises = []
+				console.log(this.known_contracts)
+				this.tokens = []
+				for (var i = 0; i < this.known_contracts.length; i++) {
+					var req = self.buildGetTokensOfOwnerRequest(self.known_contracts[i])
+					Promise.all([smartEcoRouter.invokeRead(req), Promise.resolve(self.known_contracts[i])])
+						.then(function(values) {
+							r = values[0]
+							contract = values[1]
+							var deserialized = Neon.sc.StackItem.deserialize(r["stack"][0]["value"])
+							for (i=0; i< deserialized["value"].length; i++) {
+								console.log(deserialized["value"][i]["value"])
+								var id = parseInt(deserialized["value"][i]["value"]["value"], 16)
+								var uriRequest = self.buildURIRequest(id, contract)
+								var ownerRequest = self.buildOwnerOfRequest(id, contract)	
+
+								Promise.all([smartEcoRouter.invokeRead(uriRequest), smartEcoRouter.invokeRead(ownerRequest), Promise.resolve(id)])
+									.then(function(values) {
+										var uri = self.convertHexToString(values[0]["stack"][0]["value"])
+										var owner = self.convertHexToString(values[1]["stack"][0]["value"])
+										console.log(values[2])
+										self.tokens.push ({
+											"token_id": values[2],
+											"uri": uri,
+											"owner": Neon.wallet.getAddressFromScriptHash(Neon.u.reverseHex(values[1]["stack"][0]["value"]))
+										})
+									})
+									.catch(function(e) {
+										console.log(e)
+									})
+							}
+						})
+						.catch(function(e) {
+							console.log(e)
+						})
+
+				}
+			},
+
+			loadAllTokensForContract() {
+				var self = this
+				smartEcoRouter = new smartEco.SmartEcoRouter()
+				smartEcoRouter.start()
+				this.tokens = []
+				smartEcoRouter.invokeRead(self.buildTotalSupplyRequest())
+					.then(function(r) {
+						var totalSupply = parseInt(r["stack"][0]["value"], 16)
+						for (i=1; i< totalSupply + 1; i++) {
+							var uriRequest = self.buildURIRequest(i, self.contract_hash)
+							var ownerRequest = self.buildOwnerOfRequest(i, self.contract_hash)	
+
+							Promise.all([smartEcoRouter.invokeRead(uriRequest), smartEcoRouter.invokeRead(ownerRequest), Promise.resolve(i)])
+								.then(function(values) {
+									var uri = self.convertHexToString(values[0]["stack"][0]["value"])
+									var owner = self.convertHexToString(values[1]["stack"][0]["value"])
+									console.log(values[2])
+									self.tokens.push ({
+										"token_id": values[2],
+										"uri": uri,
+										"owner": Neon.wallet.getAddressFromScriptHash(Neon.u.reverseHex(values[1]["stack"][0]["value"]))
+									})
+								})
+								.catch(function(e) {
+									console.log(e)
+								})
+						}
+					})
+					.catch(function(e) {
+						console.log(e)
+					})
+				},
+			searchForValue() {
+				if (Neon.wallet.isAddress(this.search_value)) {
+					this.address = this.search_value
+					this.loadAllTokensForAddress()
+				} else {
+					this.contract_hash = this.search_value
+					this.loadAllTokensForContract()
+				}
+			},
+		}
+	});
+</script>
+	<script src="../src/assets/vendor/jquery/dist/jquery.min.js"></script>
+	<script src="../src/assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="../src/assets/js/theme.js"></script>
+	<!-- Global site tag (gtag.js) - Google Analytics -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-128562956-1"></script>
+	<script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag(){dataLayer.push(arguments);}
+		gtag('js', new Date());
+		gtag('config', 'UA-128562956-1');
+	</script>
+</body>
