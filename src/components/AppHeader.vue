@@ -1,5 +1,5 @@
 <template>
-<div id= "app">
+<div>
 <nav class="navbar navbar-expand-lg navbar-light">
 		<a class="navbar-brand" href="#"><img src="<%= BASE_URL %>../../o3-logo-light.png" height="30" /></a>
 		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar_example_1" aria-controls="navbar_example_1" aria-expanded="false" aria-label="Toggle navigation">

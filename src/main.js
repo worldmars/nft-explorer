@@ -7,7 +7,8 @@ Vue.use(VueRouter)
 const routes =  [
   { path: '/', component: App.components.NFTExplorer },
   { path: '/explorer', component: App.components.NFTExplorer },
-  { path: '/foundry', component: App.components.TokenFoundry }
+  { path: '/foundry', component: App.components.TokenFoundry },
+  { path: '/details', component: App.components.TokenDetails}
 ]
 
 const router = new VueRouter({

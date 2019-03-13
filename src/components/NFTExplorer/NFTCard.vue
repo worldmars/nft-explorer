@@ -1,4 +1,5 @@
 <template>
+<router-link to="/details">
 <div class="card shadow">
     <div class="card shadow">
             <div class="card-body">
@@ -11,6 +12,7 @@
             </div>
         </div>
     </div>
+</router-link>
 </template>
 
 <script>
