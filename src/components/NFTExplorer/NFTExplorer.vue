@@ -9,35 +9,40 @@
     <div class="row mt-3 mb-4">
 		<div class="col col-md-6 mx-auto">
 			<div class="input-group mb-1">
-				<input v-model="search_value" placeholder="Contract or User Address" aria-label="NEO address" aria-describedby="basic-addon2" class="form-control">
+				<input class="form-control" v-model="search_value" v-bind:class= "{'is-valid': valid_input, 'is-invalid': valid_input == false}"
+				 placeholder="Contract or User Address" aria-label="NEO address" aria-describedby="basic-addon2">
 				<div class="input-group-append">
 					<button type="button" v-on:click="searchForValue" class="btn btn-primary btn-o3-primary">
 						Search
 					</button>
+				</div>
+				<div class="invalid-feedback">
+					Please provide a valid contract or user address
+				</div>
+				<div class="valid-feedback">
+					{{valid_text}}
 				</div>
 			</div>
 		</div>
 	</div>
 
 	<section class="container">
-		<div class="text-center success-message mb-4"> 
+		<div class="text-center success-message mb-4" v-if="totalSupply != undefined && totalSupply > 0"> 
 				Contract Loaded {{ totalSupply }} NFT's Found
 		</div>
 
 		<div class="row row-grid d-lg-flex">
-			<div class="col-sm-6 col-lg-4 mb-lg-4" v-for="nft in tokens" :key="nft.token_id">
+			<div class="col-sm-6 col-lg-4 mb-lg-4" v-for="nft in tokens">
 				<NFTCard :token_id="nft.token_id" :owner="nft.owner" :uri="nft.uri" :contract="nft.contract"></NFTCard>
 			</div>
 		</div>
 
-		<div class="d-flex justify-content-center">
+		<div class="d-flex justify-content-center" v-if="totalSupply != undefined && total_pages > 0">
 			<nav aria-label="Token Paging">
 				<ul class="pagination">
-					<li class="page-item"><a class="page-link" href="#">Previous</a></li>
-					<li class="page-item"><a class="page-link" href="#">1</a></li>
-					<li class="page-item"><a class="page-link" href="#">2</a></li>
-					<li class="page-item"><a class="page-link" href="#">3</a></li>
-					<li class="page-item"><a class="page-link" href="#">Next</a></li>
+					<li class="page-item paging-button"><a class="page-link" v-on:click="decrementPage">Previous</a></li>
+					<li class="page-item paging-button"><a class="page-link">{{current_page + 1}}</a></li>
+					<li class="page-item paging-button"><a class="page-link" v-on:click="incrementPage" >Next</a></li>
 				</ul>
 			</nav>
 		</div>
@@ -45,7 +50,7 @@
 
 		
 		
-		<section class="container"> 
+		<section class="container" v-if="totalSupply == undefined || totalSupply == 0"> 
 				<img class="mx-auto d-block" src="<%= BASE_URL %>../../ConfusedLuna.png" />
 				<div class="col-6 mx-auto text-center">
 					<div class="landing-info mb-1">Don't know any NFT addresses or contracts? Check these out!</div>
@@ -67,15 +72,20 @@
 		data: function () {
 			return {
 				search_value:"ef26427f9eaeed31c57884dbbc2bda5de7b5dab8",
+				valid_input: true,
+				valid_text: "Succesfully Validated Contract",
 				contract_hash: "",
 				address: "",
 				token_id: 0,
 				image_url:"",
-				totalSupply: 0,
+				totalSupply: undefined,
 				//Known Contracts should probably be parsed out into a server side method
 				known_contracts: ["ef26427f9eaeed31c57884dbbc2bda5de7b5dab8",
 													"5b9c51062ccd3c99346febb4fda31dbe506e92d9"],
-				tokens:[]
+				tokens:[],
+				current_page: 0,
+				items_per_page: 3,
+				total_pages: 0
 			}
 		}, 
 		methods:{
@@ -143,13 +153,34 @@
         			str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
     			return str;
 			},
+
+			incrementPage() {
+				console.log("Incrementing Page")
+				if (this.current_page == this.total_pages - 1) {
+					return
+				}
+				this.current_page = this.current_page + 1
+				this.loadTokensForContractPage()
+			},
+
+			decrementPage() {
+				console.log("Decrementing Page")
+				if (this.current_page == 0) {
+					return
+				}
+				this.current_page = this.current_page - 1
+				this.loadTokensForContractPage()
+			},
 			
 			loadAllTokensForAddress() {
 				var self = this
 				var smartEcoRouter = new smartEco.SmartEcoRouter()
 				smartEcoRouter.start()
-
-				this.tokens = []
+				self.tokens = []
+				self.current_page = 0
+				self.total_pages = 0
+				self.totalSupply = 0
+				var counterForTotalSupply = 0
 				for (var i = 0; i < this.known_contracts.length; i++) {
 					var req = self.buildGetTokensOfOwnerRequest(self.known_contracts[i])
 					Promise.all([smartEcoRouter.invokeRead(req), Promise.resolve(self.known_contracts[i])])
@@ -171,6 +202,7 @@
 											"owner": Neon.wallet.getAddressFromScriptHash(Neon.u.reverseHex(values[1]["stack"][0]["value"])),
 											"contract": contract
 										})
+										self.totalSupply +=1
 									})
 									.catch(function() {
 										//handle error
@@ -183,7 +215,35 @@
 
 				}
 			},
+			loadTokensForContractPage() {
+				var self = this
+				var smartEcoRouter = new smartEco.SmartEcoRouter()
+				smartEcoRouter.start()
+				this.tokens = []
+				var startIndex = self.current_page * self.items_per_page + 1
+				var endIndex = Math.min(self.current_page * self.items_per_page + self.items_per_page + 1, self.totalSupply + 1)
+	
+				for (var i=startIndex; i<endIndex; i++) {
+					var uriRequest = self.buildURIRequest(i, self.contract_hash)
+					var ownerRequest = self.buildOwnerOfRequest(i, self.contract_hash)	
 
+					Promise.all([smartEcoRouter.invokeRead(uriRequest), smartEcoRouter.invokeRead(ownerRequest), Promise.resolve(i)])
+						.then(function(values) {
+							var uri = self.convertHexToString(values[0]["stack"][0]["value"])
+							var owner = self.convertHexToString(values[1]["stack"][0]["value"])
+							self.tokens.push ({
+								"token_id": values[2],
+								"uri": uri,
+								"owner": Neon.wallet.getAddressFromScriptHash(Neon.u.reverseHex(values[1]["stack"][0]["value"])),
+								"contract": self.contract_hash
+							})
+							console.log(self.tokens)
+						})
+						.catch(function() {
+							//handle error
+						})
+					}
+			},
 			loadAllTokensForContract() {
 				var self = this
 				var smartEcoRouter = new smartEco.SmartEcoRouter()
@@ -193,26 +253,8 @@
 				smartEcoRouter.invokeRead(self.buildTotalSupplyRequest())
 					.then(function(r) {
 						self.totalSupply = parseInt(r["stack"][0]["value"], 16)
-						for (var i=1; i< self.totalSupply + 1; i++) {
-							var uriRequest = self.buildURIRequest(i, self.contract_hash)
-							var ownerRequest = self.buildOwnerOfRequest(i, self.contract_hash)	
-
-							Promise.all([smartEcoRouter.invokeRead(uriRequest), smartEcoRouter.invokeRead(ownerRequest), Promise.resolve(i)])
-								.then(function(values) {
-									var uri = self.convertHexToString(values[0]["stack"][0]["value"])
-									var owner = self.convertHexToString(values[1]["stack"][0]["value"])
-									self.tokens.push ({
-										"token_id": values[2],
-										"uri": uri,
-										"owner": Neon.wallet.getAddressFromScriptHash(Neon.u.reverseHex(values[1]["stack"][0]["value"])),
-										"contract": self.contract_hash
-									})
-									console.log(self.tokens)
-								})
-								.catch(function() {
-									//handle error
-								})
-						}
+						self.total_pages = Math.ceil(self.totalSupply / self.items_per_page)
+						self.loadTokensForContractPage()
 					})
 					.catch(function() {
 						//handle error
@@ -220,14 +262,20 @@
 				},
 			searchForValue() {
 				if (Neon.wallet.isAddress(this.search_value)) {
+					this.valid_input = true
+					this.valid_text = "Succesfully validated address"
 					this.address = this.search_value
 					this.loadAllTokensForAddress()
-				} else {
+				} else if (Neon.u.isHex(this.search_value) && this.search_value.length == 40) {
+					this.valid_input = true
 					this.contract_hash = this.search_value
+					this.valid_text = "Succesfully validated contract"
 					this.loadAllTokensForContract()
+				} else {
+					this.valid_input = false
 				}
 			},
-		}, 
+		},
 	};
 </script>
 
@@ -242,6 +290,10 @@
 	color: #7ED321;
 	font-size: 18px;
 	font-weight: bold;
+}
+
+.paging-button {
+	min-width: 100px;
 }
 
 </style>

@@ -43,6 +43,7 @@
 
 <script type="text/javascript">
 	import NFTCard from './NFTExplorer/NFTCard.vue'
+import { match } from 'minimatch';
 	
 	export default {
         name: "TokenDetails",
@@ -90,6 +91,24 @@
 						"network": "TestNet"
 					}
             },
+            buildTransferRequest() {
+                return {
+                    "scriptHash": this.$route.params.contract_hash,
+						"operation": "transfer",
+						"args": [
+							{
+								"type": 'ByteArray',
+								"value": Neon.u.reverseHex(Neon.wallet.getScriptHashFromAddress(this.transfer_address))
+                            }, {
+                                "type": 'Integer',
+								"value": parseInt(this.$route.params.id, 10)
+                            }
+                            
+                        ],
+                        "fee": "0",
+						"network": "TestNet"
+                }
+            },  
             loadTokenCard() {
                 console.log("loading token card")
                 var uriRequest = this.buildURIRequest()
@@ -111,7 +130,19 @@
                 })
             },
             performTransfer() {
+                var transferRequest = this.buildTransferRequest()
+                console.log(transferRequest)
+                var self = this
+                var smartEcoRouter = new smartEco.SmartEcoRouter()
+                smartEcoRouter.start()
                 
+                smartEcoRouter.invoke(transferRequest)
+                .then(function(r) {
+                    console.log(r)
+                }) 
+                .catch(function(e){
+                    console.log(e)
+                })
             }
         },
         mounted: function () {
