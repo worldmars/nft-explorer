@@ -1,5 +1,5 @@
 <template>
-<router-link to="/details">
+<router-link :to="{ name: 'details', params: { contract_hash: contract, id: token_id }}">
 <div class="card shadow">
     <div class="card shadow">
             <div class="card-body">

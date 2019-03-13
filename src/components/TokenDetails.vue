@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="col-sm-6 col-lg-4 mb-lg-4 mx-auto mt-5">
-            <NFTCard  :token_id="token_id" :owner="owner" :uri="uri" :contract="contract_hash"></NFTCard>
+            <NFTCard  :token_id="$route.params.id" :owner="owner" :uri="uri" :contract="$route.params.contract_hash"></NFTCard>
         </div>
         <div class=row>
             <div class="col col-md-6 mx-auto">
@@ -51,16 +51,71 @@
         }, 
         data: function() {
             return {
-                "token_id": 100,
-                "uri": "https://media.giphy.com/media/z0tbFpl7UBF0A/giphy.gif",
-                "owner": "AKzUziiiv9vHj8hX3bYQFVUktk36u6C5w3",
-                "contract_hash":"asbbbb"
+                "uri": "",
+                "owner": "",
+                "transfer_address":"AKzUziiiv9vHj8hX3bYQFVUktk36u6C5w3"
             }
         }, 
         methods: {
-            performTransfer() {
+            convertHexToString(hex) {
+    			var str = '';
+    			for (var i = 0; (i < hex.length && hex.substr(i, 2) !== '00'); i += 2)
+        			str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+                return str;
+            },
+            buildURIRequest() {
+				return {
+						"scriptHash": this.$route.params.contract_hash,
+  						"operation": "uri",
+  						"args": [
+    						{
+      							"type": 'Integer',
+      							"value": parseInt(this.$route.params.id, 10)
+      						}
+  						],
+  						"network": "TestNet"
+					}
+				return uriRequest
+            },
+            buildOwnerOfRequest() {
+                return {
+						"scriptHash": this.$route.params.contract_hash,
+						"operation": "ownerOf",
+						"args": [
+							{
+								"type": 'Integer',
+								"value": parseInt(this.$route.params.id, 10)
+							}
+						],
+						"network": "TestNet"
+					}
+            },
+            loadTokenCard() {
+                console.log("loading token card")
+                var uriRequest = this.buildURIRequest()
+                var ownerRequest = this.buildOwnerOfRequest()
+                var self = this
+                var smartEcoRouter = new smartEco.SmartEcoRouter()
+                smartEcoRouter.start()
+                console.log(uriRequest)
+                
+                Promise.all([smartEcoRouter.invokeRead(uriRequest), smartEcoRouter.invokeRead(ownerRequest)])
+                .then(function(values) {
+                    self.uri = self.convertHexToString(values[0]["stack"][0]["value"])
+                    self.owner = Neon.wallet.getAddressFromScriptHash(Neon.u.reverseHex(values[1]["stack"][0]["value"]))
 
+                    console.log(self.uri)  
+                })  
+                .catch(function(e) {
+                    console.log(e)
+                })
+            },
+            performTransfer() {
+                
             }
+        },
+        mounted: function () {
+            this.loadTokenCard()
         }
     }
 </script>
