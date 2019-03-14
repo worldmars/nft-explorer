@@ -54,8 +54,8 @@
 				<img class="mx-auto d-block" src="<%= BASE_URL %>../../ConfusedLuna.png" />
 				<div class="col-6 mx-auto text-center">
 					<div class="landing-info mb-1">Don't know any NFT addresses or contracts? Check these out!</div>
-					<div class="landing-info mb-1">O3 Meme Vault (abc123)</div>
-					<div class="landing-info mb-1">O3 Foundry (abc123)</div>
+					<div class="landing-info mb-1">O3 Foundry <a href="#" v-on:click="navigateToFoundry">5b9c51062ccd3c99346febb4fda31dbe506e92d9</a></div>
+					<div class="landing-info mb-1">HashPuppies, the OG NFT <a href="#" v-on:click="navigateToHashPuppy">e7b2046b2412c4c7f1531ce144a73d47c3b272fe</a></div>
 					<div class="landing-info mb-1">Or mint your own tokens in the O3 Foundry</div>
 				</div>
 	</section>
@@ -71,7 +71,7 @@
 		},
 		data: function () {
 			return {
-				search_value:"ef26427f9eaeed31c57884dbbc2bda5de7b5dab8",
+				search_value:"e7b2046b2412c4c7f1531ce144a73d47c3b272fe",
 				valid_input: true,
 				valid_text: "Succesfully Validated Contract",
 				contract_hash: "",
@@ -80,8 +80,10 @@
 				image_url:"",
 				totalSupply: undefined,
 				//Known Contracts should probably be parsed out into a server side method
-				known_contracts: ["ef26427f9eaeed31c57884dbbc2bda5de7b5dab8",
-													"5b9c51062ccd3c99346febb4fda31dbe506e92d9"],
+				known_contracts: [ "e7b2046b2412c4c7f1531ce144a73d47c3b272fe",
+													"ef26427f9eaeed31c57884dbbc2bda5de7b5dab8",
+													"5b9c51062ccd3c99346febb4fda31dbe506e92d9",
+													],
 				tokens:[],
 				current_page: 0,
 				items_per_page: 3,
@@ -170,6 +172,16 @@
 				}
 				this.current_page = this.current_page - 1
 				this.loadTokensForContractPage()
+			},
+
+			navigateToFoundry() {
+				this.search_value = "5b9c51062ccd3c99346febb4fda31dbe506e92d9"
+				this.searchForValue()
+			},
+
+			navigateToHashPuppy() {
+				this.search_value = "e7b2046b2412c4c7f1531ce144a73d47c3b272fe"
+				this.searchForValue()
 			},
 			
 			loadAllTokensForAddress() {

@@ -31,7 +31,7 @@
         <div class="col col-md-6 mx-auto">
             <h6>Upload Resource</h6>
             <div class="input-group mb-3">
-                <input v-model="to_search_uri" placeholder="URI for image" aria-label="NEO address" aria-describedby="basic-addon2" class="form-control">
+                <input v-model="to_search_uri" v-bind:class= "{'is-invalid': uri_is_valid === false}" placeholder="URI for image" aria-label="NEO address" aria-describedby="basic-addon2" class="form-control">
                 <div class="input-group-append">
                     <button type="button" v-on:click="displayURI" class="btn btn-primary btn-o3-primary">
                         Upload
@@ -39,9 +39,6 @@
                 </div>
                 <div class="invalid-feedback">
                     Please provide a valid uri
-                </div>
-                <div class="valid-feedback">
-                    This is an invalid uri
                 </div>
             </div>
         </div>
@@ -51,13 +48,10 @@
         <div class="col col-md-6 mx-auto">
             <h6>Select The Recipient Address</h6>
             <div class="input-group mb-3">
-                <input v-model="recipient" placeholder="Recipient Address" aria-label="NEO address" aria-describedby="basic-addon2" class="form-control">
-            </div>
-            <div class="invalid-feedback">
-                    Please provide a valid uri
+                <input v-model="recipient" v-bind:class= "{'is-invalid': address_is_valid === false}" placeholder="Recipient Address" aria-label="NEO address" aria-describedby="basic-addon2" class="form-control">
+                <div class="invalid-feedback">
+                    Please provide a address
                 </div>
-                <div class="valid-feedback">
-                    This is an invalid uri
             </div>
         </div>
     </div>
@@ -78,22 +72,18 @@
             Mint Token
         </button>
     </div>        
-    <div class="row col-lg-8">
-        <div class="alert alert-success" v-if="minted" role="alert">
-        Your token has been successfully minted. It may take up to five minutes for it appear. Come back and check it out in the explorer!
-        </div>
-    </div>
-
-</div>
+    <modal ref="modal" :title="modalTitle" :description="modalDescription" :modalAction="modalAction"></modal>
 </div>
 </template>
 
 <script>
 import NFTCard from './NFTExplorer/NFTCard.vue'
+import modal from "./modal.vue"
 
 export default {
     components: {
-        NFTCard
+        NFTCard,
+        modal
     },
     data: function () {
         return {
@@ -102,7 +92,16 @@ export default {
             "contract_hash": "5b9c51062ccd3c99346febb4fda31dbe506e92d9",
             "contract_is_nft": true,
             "recipient": "AafQxV6wQhtGYGYFboEyBjw3eMYNtBFW8J", 
-            "minted": false
+            "show-modal": false,
+            "minted": false,
+
+            "address_is_valid": undefined,
+            "uri_is_valid": undefined,
+
+            //modal after
+            "modalTitle": "",
+            "modalDescription": "",
+            "modalAction": function() {}
         }
     }, 
     methods:{
@@ -161,8 +160,23 @@ export default {
                     self.contract_is_nft = false
                 })                        
             }
+        }, validateFields() {
+            this.uri_is_valid = true
+            this.address_is_valid = true
+            if (this.loaded_uri.match(/\.(jpeg|jpg|gif|png)$/) == null) {
+                this.uri_is_valid = false
+                return false
+            } else if (Neon.wallet.isAddress(this.recipient) == false) {
+                this.address_is_valid = false
+                return false
+            } 
+            return true
         },
+
         mintToken() {
+            if (!this.validateFields()) {
+                return
+            }
             var self = this
             var smartEcoRouter = new smartEco.SmartEcoRouter()
             smartEcoRouter.start()
@@ -170,10 +184,25 @@ export default {
             console.log(r)
             smartEcoRouter.invoke(r)
             .then(function(r) {
+                console.log("hello")
                 self.minted = true
+                self.modalTitle = "Mint Succeeded"
+                self.modalDescription = "You're token has succeeded in minting, it should show up in the explorer in a couple of minutes"
+                self.modalAction = function() {
+                    console.log("replacing route")
+                    self.$router.replace({ name: 'explorer'})
+                }
+                let element = self.$refs.modal.$el
+                $(element).modal('show')
             })
             .catch(function(e) {
                 console.log(e)
+                let element = self.$refs.modal.$el
+                self.modalTitle = "Mint Failed"
+                self.modalDescription = "Something went wrong, double check your information and try again in a a couple of minutes"
+                self.modalAction = function() {}
+
+                $(element).modal('show')
             })
         }
     }
