@@ -77,8 +77,8 @@
 		},
 		data: function () {
 			return {
-				search_value:"AafQxV6wQhtGYGYFboEyBjw3eMYNtBFW8J",
-				valid_input: true,
+				search_value:"",
+				valid_input: false,
 				valid_text: "Successfully Validated Contract",
 				contract_hash: "",
 				address: "",
