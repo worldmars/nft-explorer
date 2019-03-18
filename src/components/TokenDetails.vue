@@ -57,7 +57,7 @@
             return {
                 "uri": "",
                 "owner": "",
-                "transfer_address":"AKzUziiiv9vHj8hX3bYQFVUktk36u6C5w3",
+                "transfer_address":"",
 
                 //modal after
                 "modalTitle": "",
