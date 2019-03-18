@@ -29,7 +29,7 @@
 
     <div class="row">
         <div class="col col-md-6 mx-auto">
-            <h6>Upload Resource</h6>
+            <h6>Upload a gif from <a target="_blank" href="" >Giphy</a></h6>
             <div class="input-group mb-3">
                 <input v-model="to_search_uri" v-bind:class= "{'is-invalid': uri_is_valid === false}" placeholder="URI for image" aria-label="NEO address" aria-describedby="basic-addon2" class="form-control">
                 <div class="input-group-append">
@@ -89,9 +89,9 @@ export default {
         return {
             "to_search_uri": "https://media.giphy.com/media/Wyt6sLEjKjaFjzybth/giphy.gif",
             "loaded_uri": "https://media.giphy.com/media/Wyt6sLEjKjaFjzybth/giphy.gif",
-            "contract_hash": "5b9c51062ccd3c99346febb4fda31dbe506e92d9",
+            "contract_hash": "d3fcdaa4f7f14e9044120f3372388570b2f40235",
             "contract_is_nft": true,
-            "recipient": "AafQxV6wQhtGYGYFboEyBjw3eMYNtBFW8J", 
+            "recipient": "", 
             "show-modal": false,
             "minted": false,
 
@@ -124,12 +124,15 @@ export default {
             return supportedStandardsRequest
         },
         buildMintTokensRequest() {
+            var time = new Date()
+            var rwProps = {"created_at": time.getTime()}
             var mintTokensRequest = { "scriptHash": this.contract_hash,
                 "operation": "mintToken",
                 "args": [
                     {"type": "ByteArray", "value": Neon.u.reverseHex(Neon.wallet.getScriptHashFromAddress(this.recipient))},
-                    {"type": "ByteArray", "value": "00"},
-                    {"type": "ByteArray", "value": Neon.u.str2hexstring(this.loaded_uri)}
+                    {"type": "ByteArray", "value": "4f3320526f636b73"},
+                    {"type": "ByteArray", "value": Neon.u.str2hexstring(this.loaded_uri)},
+                    {"type": "ByteArray", "value": Neon.u.str2hexstring(JSON.stringify(rwProps))},
                 ],
                 "network": "TestNet",
                 "fee": "0"
@@ -184,7 +187,7 @@ export default {
             console.log(r)
             smartEcoRouter.invoke(r)
             .then(function(r) {
-                console.log("hello")
+                console.log(r)
                 self.minted = true
                 self.modalTitle = "Mint Succeeded"
                 self.modalDescription = "You're token has succeeded in minting, it should show up in the explorer in a couple of minutes"
@@ -212,6 +215,6 @@ export default {
 <style>
  .landing-info {
 	color: #000000;
-	font-size: 12px;
+	font-size: 13px;
 	text-align: center;
 }

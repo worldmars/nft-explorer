@@ -18,9 +18,7 @@
                     </div>
                 </div>
                 <div class="d-flex justify-content-center">
-                    <button type="button" class="btn btn-primary btn-o3-primary">
-                            Get in touch with us today
-                    </button>
+                    <a href="mailto:hello@o3.network" target="_blank" class="btn btn-primary btn-o3-primary">Get in touch with us today</a>
                     </div>
                 </div>
             </div>

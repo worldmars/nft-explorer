@@ -5,6 +5,12 @@
 			<span class="navbar-toggler-icon"></span>
 		</button>
 		<div class="collapse navbar-collapse" id="navbar_example_1">
+			<ul class="navbar-nav">
+      <li class>
+        <router-link to="/explorer" class="nav-title">NFT Home</router-link>
+      </li>
+			</ul>
+
 			<ul class="navbar-nav ml-auto">
 				<li class="nav-item active">
 					<router-link to="/explorer" class="nav-link">NFT Explorer</router-link>
@@ -33,7 +39,7 @@ export default {
 
 	.navbar-light .navbar-nav .nav-link {
  		color:	#218FFF;
-		opacity: 0.5;
+		opacity: 1.0;
 	}
 
 	/* change the brand and text color */
@@ -47,7 +53,14 @@ export default {
 .navbar-light .nav-item:focus .nav-link,
 .navbar-light .nav-item:hover .nav-link {
     color:	#218FFF;
-		opacity: 1.0;
+		opacity: 0.5;
+}
+
+.nav-title {
+	color: #929292;
+	font-family: 'Nunito', sans-serif;
+  font-size: .875rem;
+  font-weight: 600;
 }
 
 	

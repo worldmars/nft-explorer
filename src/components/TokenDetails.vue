@@ -14,7 +14,8 @@
                     Currently this NFT is owned by this address:<br> {{ owner }}.
                 </p>
                 <p class="text-center">
-                    If that's you, you have the ability to transfer it to anyone you like.
+                    If that’s you, you have the ability to transfer it to anyone you like. 
+                    If not, why not try to mint your own at the <router-link to="/foundry">Token Foundry</router-link>.
                 </p>
             </div>
         </div>
@@ -105,7 +106,7 @@ import { match } from 'minimatch';
                             }
                             
                         ],
-                        "fee": "0",
+                        "fee": "0", 
 						"network": "TestNet"
                 }
             },  

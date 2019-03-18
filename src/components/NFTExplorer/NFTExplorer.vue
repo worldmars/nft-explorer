@@ -2,8 +2,8 @@
 <div id="explorer">
 	<div class="row mt-5">
 		<div class="col-6 mx-auto text-center">
-			Welcome to O3’s Non fungible token (NFT) explorer and minter.
-			To get started, please make sure you have O3 desktop wallet installed and <a href="https://www.o3.network">set to TestNet</a>.
+			Welcome to O3's Non fungible token (NFT) explorer and minter. This POC is to help developers get started with NFT's
+			in the NEO Smart Economy. <a href="#">Learn More</a>
 		</div>
 	</div>
     <div class="row mt-3 mb-4">
@@ -28,7 +28,7 @@
 
 	<section class="container">
 		<div class="text-center success-message mb-4" v-if="totalSupply != undefined && totalSupply > 0"> 
-				Contract Loaded {{ totalSupply }} NFT's Found
+				{{ totalSupply }} NFT's Found
 		</div>
 
 		<div class="row row-grid d-lg-flex">
@@ -51,9 +51,15 @@
 		
 		
 		<section class="container" v-if="totalSupply == undefined || totalSupply == 0"> 
-				<img class="mx-auto d-block" src="<%= BASE_URL %>../../ConfusedLuna.png" />
-				<div class="col-6 mx-auto text-center">
-					<div class="landing-info mb-1">Don't know any NFT addresses or contracts? Check these out!</div>
+				<div class="col-12 mx-auto text-center">
+					<div class="landing-info-title mb-1">How to get started</div>
+					<div class="landing-info mb-1">1. <a href="#" v-on:click="navigateToFoundry">Download O3 Desktop</a></div>
+					<div class="landing-info mb-1">2. <a href="#" v-on:click="navigateToHashPuppy">Switch Network to Testnet</a></div>
+					<div class="landing-info mb-1">3. Explore &amp; Mint NFT's</div>
+				</div>
+				<br>
+				<div class="col-12 mx-auto text-center">
+					<div class="landing-info-title mb-1">Don't know any NFT addresses or contracts? Check these out!</div>
 					<div class="landing-info mb-1">O3 Foundry <a href="#" v-on:click="navigateToFoundry">5b9c51062ccd3c99346febb4fda31dbe506e92d9</a></div>
 					<div class="landing-info mb-1">HashPuppies, the OG NFT <a href="#" v-on:click="navigateToHashPuppy">e7b2046b2412c4c7f1531ce144a73d47c3b272fe</a></div>
 					<div class="landing-info mb-1">Or mint your own tokens in the O3 Foundry</div>
@@ -71,22 +77,23 @@
 		},
 		data: function () {
 			return {
-				search_value:"e7b2046b2412c4c7f1531ce144a73d47c3b272fe",
+				search_value:"AafQxV6wQhtGYGYFboEyBjw3eMYNtBFW8J",
 				valid_input: true,
-				valid_text: "Succesfully Validated Contract",
+				valid_text: "Successfully Validated Contract",
 				contract_hash: "",
 				address: "",
 				token_id: 0,
 				image_url:"",
 				totalSupply: undefined,
 				//Known Contracts should probably be parsed out into a server side method
-				known_contracts: [ "e7b2046b2412c4c7f1531ce144a73d47c3b272fe",
-													"ef26427f9eaeed31c57884dbbc2bda5de7b5dab8",
-													"5b9c51062ccd3c99346febb4fda31dbe506e92d9",
+				known_contracts: [ //"e7b2046b2412c4c7f1531ce144a73d47c3b272fe",
+													//"ef26427f9eaeed31c57884dbbc2bda5de7b5dab8",
+													"d3fcdaa4f7f14e9044120f3372388570b2f40235"
+													//"4e2d82efae9bae7e6d3ccb016ab768a607c49c10"
 													],
 				tokens:[],
 				current_page: 0,
-				items_per_page: 3,
+				items_per_page: 9,
 				total_pages: 0
 			}
 		}, 
@@ -199,9 +206,13 @@
 						.then(function(values) {
 							var r = values[0]
 							var contract = values[1]
+							console.log(r)
 							var deserialized = Neon.sc.StackItem.deserialize(r["stack"][0]["value"])
+							console.log(deserialized)
 							for (i=0; i< deserialized["value"].length; i++) {
-								var id = parseInt(deserialized["value"][i]["value"]["value"], 16)
+								var idHex = deserialized["value"][i]["value"]["value"][0]["value"]["value"]
+								console.log(idHex)
+								var id = parseInt(idHex, 16)
 								var uriRequest = self.buildURIRequest(id, contract)
 								var ownerRequest = self.buildOwnerOfRequest(id, contract)	
 								Promise.all([smartEcoRouter.invokeRead(uriRequest), smartEcoRouter.invokeRead(ownerRequest),Promise.resolve(id), Promise.resolve(contract)])
@@ -277,6 +288,7 @@
 					this.valid_input = true
 					this.valid_text = "Succesfully validated address"
 					this.address = this.search_value
+					console.log(this.address)
 					this.loadAllTokensForAddress()
 				} else if (Neon.u.isHex(this.search_value) && this.search_value.length == 40) {
 					this.valid_input = true
@@ -294,7 +306,14 @@
 <style>
  .landing-info {
 	color: #000000;
-	font-size: 12px;
+	font-size: 13px;
+	text-align: center;
+}
+
+.landing-info-title {
+	color: #000000;
+	font-size: 13px;
+	font-weight: bold;
 	text-align: center;
 }
 
