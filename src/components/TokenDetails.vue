@@ -15,7 +15,7 @@
                 </p>
                 <p class="text-center">
                     If that’s you, you have the ability to transfer it to anyone you like. 
-                    If not, why not try to mint your own at the <router-link to="/foundry">Token Foundry</router-link>.
+                    If not, why not try to mint your own at the <router-link to="/foundry"  >Token Foundry</router-link>.
                 </p>
             </div>
         </div>
@@ -39,12 +39,14 @@
                 </p>
             </div>
         </div>
+        <modal ref="modal" :title="modalTitle" :description="modalDescription" :modalAction="modalAction"></modal>
     </div>
 </template>
 
 <script type="text/javascript">
-	import NFTCard from './NFTExplorer/NFTCard.vue'
-import { match } from 'minimatch';
+    import NFTCard from './NFTExplorer/NFTCard.vue'
+    import modal from "./modal.vue"
+    import { match } from 'minimatch';
 	
 	export default {
         name: "TokenDetails",
@@ -55,7 +57,12 @@ import { match } from 'minimatch';
             return {
                 "uri": "",
                 "owner": "",
-                "transfer_address":"AKzUziiiv9vHj8hX3bYQFVUktk36u6C5w3"
+                "transfer_address":"AKzUziiiv9vHj8hX3bYQFVUktk36u6C5w3",
+
+                //modal after
+                "modalTitle": "",
+                "modalDescription": "",
+                "modalAction": function() {}
             }
         }, 
         methods: {
@@ -139,10 +146,21 @@ import { match } from 'minimatch';
                 
                 smartEcoRouter.invoke(transferRequest)
                 .then(function(r) {
-                    console.log(r)
+                    self.modalTitle = "Transfer Succeeded"
+                    self.modalDescription = "You're token has succeeded in transferring, it should show up in the explorer in a couple of minutes"
+                    self.modalAction = function() {
+                        console.log("replacing route")
+                        self.$router.replace({ name: 'explorer'})
+                    }
+                    let element = self.$refs.modal.$el
+                    $(element).modal('show')
                 }) 
                 .catch(function(e){
-                    console.log(e)
+                    let element = self.$refs.modal.$el
+                    self.modalTitle = "Mint Failed"
+                    self.modalDescription = "Something went wrong, double check your information and try again in a a couple of minutes"
+                    self.modalAction = function() {}
+                    $(element).modal('show')
                 })
             }
         },

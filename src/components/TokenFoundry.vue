@@ -29,7 +29,7 @@
 
     <div class="row">
         <div class="col col-md-6 mx-auto">
-            <h6>Upload a gif from <a target="_blank" href="" >Giphy</a></h6>
+            <h6>Upload a gif from <a target="_blank" href="https://giphy.com/" >Giphy</a></h6>
             <div class="input-group mb-3">
                 <input v-model="to_search_uri" v-bind:class= "{'is-invalid': uri_is_valid === false}" placeholder="URI for image" aria-label="NEO address" aria-describedby="basic-addon2" class="form-control">
                 <div class="input-group-append">
@@ -38,7 +38,7 @@
                     </button>
                 </div>
                 <div class="invalid-feedback">
-                    Please provide a valid uri
+                    Please provide a valid uri from Giphy (starts with https://media.giphy.com)
                 </div>
             </div>
         </div>
@@ -166,7 +166,7 @@ export default {
         }, validateFields() {
             this.uri_is_valid = true
             this.address_is_valid = true
-            if (this.loaded_uri.match(/\.(jpeg|jpg|gif|png)$/) == null) {
+            if (this.loaded_uri.match(/\.(jpeg|jpg|gif|png)$/) == null || this.loaded_uri.startsWith("https://media.giphy.com") == false) {
                 this.uri_is_valid = false
                 return false
             } else if (Neon.wallet.isAddress(this.recipient) == false) {

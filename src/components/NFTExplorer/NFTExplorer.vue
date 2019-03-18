@@ -53,14 +53,14 @@
 		<section class="container" v-if="totalSupply == undefined || totalSupply == 0"> 
 				<div class="col-12 mx-auto text-center">
 					<div class="landing-info-title mb-1">How to get started</div>
-					<div class="landing-info mb-1">1. <a href="#" v-on:click="navigateToFoundry">Download O3 Desktop</a></div>
-					<div class="landing-info mb-1">2. <a href="#" v-on:click="navigateToHashPuppy">Switch Network to Testnet</a></div>
+					<div class="landing-info mb-1">1. <a target="_blank" href="https://o3.network/">Download O3 Desktop</a></div>
+					<div class="landing-info mb-1">2. <a target="_blank" href="https://o3.network/">Switch Network to Testnet</a></div>
 					<div class="landing-info mb-1">3. Explore &amp; Mint NFT's</div>
 				</div>
 				<br>
 				<div class="col-12 mx-auto text-center">
 					<div class="landing-info-title mb-1">Don't know any NFT addresses or contracts? Check these out!</div>
-					<div class="landing-info mb-1">O3 Foundry <a href="#" v-on:click="navigateToFoundry">5b9c51062ccd3c99346febb4fda31dbe506e92d9</a></div>
+					<div class="landing-info mb-1">O3 Foundry <a href="#" v-on:click="navigateToFoundry">d3fcdaa4f7f14e9044120f3372388570b2f40235</a></div>
 					<div class="landing-info mb-1">HashPuppies, the OG NFT <a href="#" v-on:click="navigateToHashPuppy">e7b2046b2412c4c7f1531ce144a73d47c3b272fe</a></div>
 					<div class="landing-info mb-1">Or mint your own tokens in the O3 Foundry</div>
 				</div>
@@ -86,10 +86,8 @@
 				image_url:"",
 				totalSupply: undefined,
 				//Known Contracts should probably be parsed out into a server side method
-				known_contracts: [ //"e7b2046b2412c4c7f1531ce144a73d47c3b272fe",
-													//"ef26427f9eaeed31c57884dbbc2bda5de7b5dab8",
-													"d3fcdaa4f7f14e9044120f3372388570b2f40235"
-													//"4e2d82efae9bae7e6d3ccb016ab768a607c49c10"
+				known_contracts: [ "d3fcdaa4f7f14e9044120f3372388570b2f40235",
+													"4e2d82efae9bae7e6d3ccb016ab768a607c49c10"
 													],
 				tokens:[],
 				current_page: 0,
@@ -182,7 +180,7 @@
 			},
 
 			navigateToFoundry() {
-				this.search_value = "5b9c51062ccd3c99346febb4fda31dbe506e92d9"
+				this.search_value = "d3fcdaa4f7f14e9044120f3372388570b2f40235"
 				this.searchForValue()
 			},
 
