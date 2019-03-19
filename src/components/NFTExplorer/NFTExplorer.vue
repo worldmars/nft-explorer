@@ -1,7 +1,7 @@
 <template>
 <div id="explorer">
 	<div class="row mt-5">
-		<div class="col-6 mx-auto text-center">
+		<div class="col-md-6 col-s-10 mx-auto text-center">
 			Welcome to O3's Non fungible token (NFT) explorer and minter. This POC is to help developers get started with NFT's
 			in the NEO Smart Economy. <a href="#">Learn More</a>
 		</div>
@@ -190,6 +190,8 @@
 			},
 			
 			loadAllTokensForAddress() {
+				this.$emit('isWaitingForDapi')
+
 				var self = this
 				var smartEcoRouter = new smartEco.SmartEcoRouter()
 				smartEcoRouter.start()
@@ -215,6 +217,7 @@
 								var ownerRequest = self.buildOwnerOfRequest(id, contract)	
 								Promise.all([smartEcoRouter.invokeRead(uriRequest), smartEcoRouter.invokeRead(ownerRequest),Promise.resolve(id), Promise.resolve(contract)])
 									.then(function(values) {
+										self.$emit('isNotWaitingForDapi')
 										var uri = self.convertHexToString(values[0]["stack"][0]["value"])
 										var owner = self.convertHexToString(values[1]["stack"][0]["value"])
 										self.tokens.push ({
@@ -226,7 +229,7 @@
 										self.totalSupply +=1
 									})
 									.catch(function() {
-										//handle error
+										self.$emit('isNotWaitingForDapi')
 									})
 							}
 						})
@@ -238,6 +241,7 @@
 			},
 			loadTokensForContractPage() {
 				var self = this
+				self.$emit('isWaitingForDapi')
 				var smartEcoRouter = new smartEco.SmartEcoRouter()
 				smartEcoRouter.start()
 				this.tokens = []
@@ -250,6 +254,7 @@
 
 					Promise.all([smartEcoRouter.invokeRead(uriRequest), smartEcoRouter.invokeRead(ownerRequest), Promise.resolve(i)])
 						.then(function(values) {
+							self.$emit('isNotWaitingForDapi')
 							var uri = self.convertHexToString(values[0]["stack"][0]["value"])
 							var owner = self.convertHexToString(values[1]["stack"][0]["value"])
 							self.tokens.push ({
@@ -261,7 +266,7 @@
 							console.log(self.tokens)
 						})
 						.catch(function() {
-							//handle error
+							self.$emit('isNotWaitingForDapi')
 						})
 					}
 			},
@@ -278,7 +283,7 @@
 						self.loadTokensForContractPage()
 					})
 					.catch(function() {
-						//handle error
+						self.$emit('isNotWaitingForDapi')
 					})
 				},
 			searchForValue() {

@@ -181,6 +181,7 @@ export default {
                 return
             }
             var self = this
+            self.$emit('isWaitingForDapi')
             var smartEcoRouter = new smartEco.SmartEcoRouter()
             smartEcoRouter.start()
             var r = self.buildMintTokensRequest()
@@ -188,6 +189,7 @@ export default {
             smartEcoRouter.invoke(r)
             .then(function(r) {
                 console.log(r)
+                self.$emit('isNotWaitingForDapi')
                 self.minted = true
                 self.modalTitle = "Mint Succeeded"
                 self.modalDescription = "You're token has succeeded in minting, it should show up in the explorer in a couple of minutes"
@@ -200,6 +202,7 @@ export default {
             })
             .catch(function(e) {
                 console.log(e)
+                self.$emit('isNotWaitingForDapi')
                 let element = self.$refs.modal.$el
                 self.modalTitle = "Mint Failed"
                 self.modalDescription = "Something went wrong, double check your information and try again in a a couple of minutes"

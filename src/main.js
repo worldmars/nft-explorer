@@ -1,9 +1,12 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import Notifications from 'vue-notification'
 import App from './App.vue'
 
 Vue.config.productionTip = false
 Vue.use(VueRouter)
+Vue.use(Notifications)
+
 const routes =  [
   { name: "home", path: '/', component: App.components.NFTExplorer },
   { name: "explorer", path: '/explorer', component: App.components.NFTExplorer },
@@ -16,6 +19,9 @@ const router = new VueRouter({
 })
 
 new Vue({
+  components: {
+    Notifications
+  },
   render: h => h(App),
   router,
 }).$mount('#app')

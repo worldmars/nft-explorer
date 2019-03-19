@@ -138,6 +138,7 @@
                 })
             },
             performTransfer() {
+                this.$emit('isWaitingForDapi')
                 var transferRequest = this.buildTransferRequest()
                 console.log(transferRequest)
                 var self = this
@@ -146,6 +147,7 @@
                 
                 smartEcoRouter.invoke(transferRequest)
                 .then(function(r) {
+                    self.$emit('isWaitingForDapi')
                     self.modalTitle = "Transfer Succeeded"
                     self.modalDescription = "You're token has succeeded in transferring, it should show up in the explorer in a couple of minutes"
                     self.modalAction = function() {
@@ -156,6 +158,7 @@
                     $(element).modal('show')
                 }) 
                 .catch(function(e){
+                    self.$emit('isNotWaitingForDapi')
                     let element = self.$refs.modal.$el
                     self.modalTitle = "Mint Failed"
                     self.modalDescription = "Something went wrong, double check your information and try again in a a couple of minutes"
