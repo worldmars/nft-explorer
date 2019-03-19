@@ -38,7 +38,7 @@
                     </button>
                 </div>
                 <div class="invalid-feedback">
-                    Please provide a valid uri from Giphy (starts with https://media.giphy.com)
+                    Please provide a valid url from Giphy (starts with https://media.giphy.com)
                 </div>
             </div>
         </div>
