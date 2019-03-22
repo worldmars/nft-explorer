@@ -40,6 +40,7 @@
             </div>
         </div>
         <modal ref="modal" :title="modalTitle" :description="modalDescription" :modalAction="modalAction"></modal>
+        <connectModal ref="connectmodal"></connectModal>
     </div>
 </template>
 
@@ -47,11 +48,15 @@
     import NFTCard from './NFTExplorer/NFTCard.vue'
     import modal from "./modal.vue"
     import { match } from 'minimatch';
+    import connectModal from "./connectModal.vue"
+
 	
 	export default {
         name: "TokenDetails",
 		components: {
-			NFTCard
+            NFTCard,
+            connectModal,
+            modal
         }, 
         data: function() {
             return {
@@ -147,6 +152,7 @@
                 
                 smartEcoRouter.invoke(transferRequest)
                 .then(function(r) {
+                    console.log(r)
                     self.$emit('isWaitingForDapi')
                     self.modalTitle = "Transfer Succeeded"
                     self.modalDescription = "You're token has succeeded in transferring, it should show up in the explorer in a couple of minutes"
@@ -159,6 +165,23 @@
                 }) 
                 .catch(function(e){
                     self.$emit('isNotWaitingForDapi')
+                    console.log(e)
+                    if (e.type == "NO_PROVIDER") {
+                        let element = self.$refs.connectmodal.$el
+                        console.log(element)
+                        console.log(self.$refs.connectmodal)
+                        $(element).modal('show')
+                        return    
+                    } else if(e.type == "INVALID_NETWORK") {
+                        let element = self.$refs.modal.$el
+                        self.modalTitle = "Connect to the test network"
+                        self.modalDescription = "Looks like your O3 wallet is set to the mainnet. Currently only test net is available for this app. Please change to testnet in the settings menu"
+                        self.modalAction = function() {
+                        }
+                        console.log(element)
+                        $(element).modal('show')
+                        return    
+                    }
                     let element = self.$refs.modal.$el
                     self.modalTitle = "Mint Failed"
                     self.modalDescription = "Something went wrong, double check your information and try again in a a couple of minutes"

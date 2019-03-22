@@ -73,17 +73,20 @@
         </button>
     </div>        
     <modal ref="modal" :title="modalTitle" :description="modalDescription" :modalAction="modalAction"></modal>
+    <connectModal ref="connectmodal"></connectModal>
 </div>
 </template>
 
 <script>
 import NFTCard from './NFTExplorer/NFTCard.vue'
 import modal from "./modal.vue"
+import connectModal from "./connectModal.vue"
 
 export default {
     components: {
         NFTCard,
-        modal
+        modal,
+        connectModal
     },
     data: function () {
         return {
@@ -159,7 +162,8 @@ export default {
                     }
                 })
                 .catch(function(e) {
-                    console.log(e)
+                    if(erro)
+                    console.log(e) 
                     self.contract_is_nft = false
                 })                        
             }
@@ -201,8 +205,25 @@ export default {
                 $(element).modal('show')
             })
             .catch(function(e) {
-                console.log(e)
                 self.$emit('isNotWaitingForDapi')
+                console.log(e)
+                console.log(e.type)
+                if (e.type == "NO_PROVIDER") {
+                    let element = self.$refs.connectmodal.$el
+                    console.log(element)
+                    console.log(self.$refs.connectmodal)
+                    $(element).modal('show')
+                    return    
+                } else if(e.type == "INVALID_NETWORK") {
+                    let element = self.$refs.modal.$el
+                    self.modalTitle = "Connect to the test network"
+                    self.modalDescription = "Looks like your O3 wallet is set to the mainnet. Currently only test net is available for this app. Please change to testnet in the settings menu"
+                    self.modalAction = function() {}
+                    $(element).modal('show')
+                    return    
+                }
+
+
                 let element = self.$refs.modal.$el
                 self.modalTitle = "Mint Failed"
                 self.modalDescription = "Something went wrong, double check your information and try again in a a couple of minutes"
