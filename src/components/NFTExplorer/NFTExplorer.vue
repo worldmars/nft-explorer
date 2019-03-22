@@ -30,6 +30,10 @@
   	Looks like the testnet might be having issues, please check back later
 	</div>
 
+	<div v-if="addressHasNoTokens == true" class="alert alert-info col-10 col-md-6 mx-auto">
+  	Looks like this address or contract doesn't have any NFT's, try and mint a new one in the token foundry
+	</div>
+
 	<section class="container">
 		<div class="text-center success-message mb-4" v-if="totalSupply != undefined && totalSupply > 0"> 
 				{{ totalSupply }} NFT's Found
@@ -79,6 +83,7 @@
 			return {
 				search_value:"",
 				valid_input: undefined,
+				addressHasNoTokens: false,
 				valid_text: "Successfully Validated Contract",
 				contract_hash: "",
 				address: "",
@@ -215,6 +220,12 @@
 							console.log(r)
 							var deserialized = Neon.sc.StackItem.deserialize(r["stack"][0]["value"])
 							console.log(deserialized)
+							if (self.known_contracts[self.known_contracts.length-1] == contract 
+							&& deserialized["value"].length == 0 && self.totalSupply == 0) {
+								self.addressHasNoTokens = true
+								self.$emit('isNotWaitingForDapi')
+
+							}
 							for (i=0; i< deserialized["value"].length; i++) {
 								var idHex = deserialized["value"][i]["value"]["value"][0]["value"]["value"]
 								console.log(idHex)
@@ -305,6 +316,7 @@
 				},
 			searchForValue() {
 				this.unknownError = false
+				this.addressHasNoTokens = false
 				if (Neon.wallet.isAddress(this.search_value)) {
 					this.valid_input = true
 					this.valid_text = "Succesfully validated address"
