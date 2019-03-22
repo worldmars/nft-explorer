@@ -30,8 +30,8 @@
   	Looks like the testnet might be having issues, please check back later
 	</div>
 
-	<div v-if="addressHasNoTokens == true" class="alert alert-info col-10 col-md-6 mx-auto">
-  	Looks like this address or contract doesn't have any NFT's, try and mint a new one in the token foundry
+	<div v-if="addressHasNoTokens == true" class="alert alert col-10 col-md-6 mx-auto text-center">
+  	Looks like this address or contract doesn't have any NFT's, try and mint a new one in the <router-link to="/foundry">Token Foundry</router-link>
 	</div>
 
 	<section class="container">
