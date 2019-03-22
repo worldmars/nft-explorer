@@ -1,15 +1,15 @@
 <template>
 <div id="explorer">
 	<div class="row mt-5">
-		<div class="col-md-6 col-s-10 mx-auto text-center">
+		<div class="col-md-6 col-10 mx-auto text-center">
 			Welcome to O3's Non fungible token (NFT) explorer and minter. This POC is to help developers get started with NFT's
 			in the NEO Smart Economy. <a href="#">Learn More</a>
 		</div>
 	</div>
     <div class="row mt-3 mb-4">
-		<div class="col col-md-6 mx-auto">
+		<div class="col-10 col-md-6 mx-auto">
 			<div class="input-group mb-1">
-				<input class="form-control" v-model="search_value" v-bind:class= "{'is-valid': valid_input, 'is-invalid': valid_input == false}"
+				<input class="form-control" v-model="search_value" v-bind:class= "{'is-valid': valid_input == true, 'is-invalid': valid_input == false}"
 				 placeholder="Contract or User Address" aria-label="NEO address" aria-describedby="basic-addon2">
 				<div class="input-group-append">
 					<button type="button" v-on:click="searchForValue" class="btn btn-primary btn-o3-primary">
@@ -24,6 +24,10 @@
 				</div>
 			</div>
 		</div>
+	</div>
+
+	<div v-if="unknownError == true" class="alert alert-danger col-10 col-md-6 mx-auto">
+  	Looks like the testnet might be having issues, please check back later
 	</div>
 
 	<section class="container">
@@ -74,7 +78,7 @@
 		data: function () {
 			return {
 				search_value:"",
-				valid_input: false,
+				valid_input: undefined,
 				valid_text: "Successfully Validated Contract",
 				contract_hash: "",
 				address: "",
@@ -93,7 +97,9 @@
 				//modal stuff
 				modalTitle: "Connect to the test network",
         modalDescription: "Looks like your O3 wallet is set to the mainnet. Currently only test net is available for this app. Please change to testnet in the settings menu",
-				modalAction: function() {}
+				modalAction: function() {},
+
+				unknownError: false
 			}
 		}, 
 		methods:{
@@ -230,11 +236,13 @@
 									})
 									.catch(function() {
 										self.$emit('isNotWaitingForDapi')
+										self.unknownError = true
 									})
 							}
 						})
 						.catch(function() {
-							//handle error
+							self.$emit('isNotWaitingForDapi')
+							self.unknownError = true
 						})
 
 				}
@@ -268,11 +276,13 @@
 						})
 						.catch(function() {
 							self.$emit('isNotWaitingForDapi')
+							self.unknownError = true
 						})
 					}
 			},
 			loadAllTokensForContract() {
 				var self = this
+				self.$emit('isWaitingForDapi')
 				var smartEcoRouter = new smartEco.SmartEcoRouter()
 				smartEcoRouter.start()
 				this.tokens = []
@@ -289,9 +299,12 @@
 					})
 					.catch(function() {
 						self.$emit('isNotWaitingForDapi')
+						self.unknownError = true
+			
 					})
 				},
 			searchForValue() {
+				this.unknownError = false
 				if (Neon.wallet.isAddress(this.search_value)) {
 					this.valid_input = true
 					this.valid_text = "Succesfully validated address"
@@ -319,7 +332,7 @@
             $(element).modal('show')
 					}
 				}).catch(function(e){
-					console.log(e)
+					
 				})
     }
 	};

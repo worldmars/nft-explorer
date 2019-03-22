@@ -1,14 +1,14 @@
 <template>
 <div id="foundry">
     <div class="row mt-5 mb-3">
-		<div class="col-6 mx-auto landing-info">
+		<div class="col-10 col-md-6 mx-auto landing-info">
 			Welcome to O3 Token Foundry! Here you can mint yourself a unique NFT on the O3 NFT contract.
             The goal of the Token Foundary is to give a simple way to get started with NFTs and start building concepts based around unique collectible tokens.
 		</div>
 	</div>
 
     <div class="row">
-        <div class="col col-md-6 mx-auto">
+        <div class="col-10 col-md-6 mx-auto">
             <h6>Select An NFT Contract</h6>
             <div class="input-group mb-3">
                 <input class="form-control" v-bind:class= "{'is-valid': contract_is_nft, 'is-invalid': contract_is_nft == false}" v-model="contract_hash" placeholder="URI for image" aria-label="NEO address" aria-describedby="basic-addon2">
@@ -28,7 +28,7 @@
     </div>
 
     <div class="row">
-        <div class="col col-md-6 mx-auto">
+        <div class="col-10 col-md-6 mx-auto">
             <h6>Upload a gif from <a target="_blank" href="https://giphy.com/" >Giphy</a></h6>
             <div class="input-group mb-3">
                 <input v-model="to_search_uri" v-bind:class= "{'is-invalid': uri_is_valid === false}" placeholder="URI for image" aria-label="NEO address" aria-describedby="basic-addon2" class="form-control">
@@ -45,7 +45,7 @@
     </div>
     
     <div class="row mb-3">
-        <div class="col col-md-6 mx-auto">
+        <div class="col-10 col-md-6 mx-auto">
             <h6>Select The Recipient Address</h6>
             <div class="input-group mb-3">
                 <input v-model="recipient" v-bind:class= "{'is-invalid': address_is_valid === false}" placeholder="Recipient Address" aria-label="NEO address" aria-describedby="basic-addon2" class="form-control">
@@ -56,7 +56,7 @@
         </div>
     </div>
 
-    <div class="col-sm-6 col-lg-4 mb-lg-4 mx-auto">
+    <div class="col-10 col-sm-6 col-lg-4 mb-lg-4 mx-auto">
         <NFTCard  :token_id="100" :owner="recipient" :uri="loaded_uri" :contract="contract_hash"></NFTCard>
     </div>
 
@@ -224,11 +224,11 @@ export default {
                 }
 
 
-                let element = self.$refs.modal.$el
+                
                 self.modalTitle = "Mint Failed"
                 self.modalDescription = "Something went wrong, double check your information and try again in a a couple of minutes"
                 self.modalAction = function() {}
-
+                let element = self.$refs.modal.$el
                 $(element).modal('show')
             })
         }

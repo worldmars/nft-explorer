@@ -13,7 +13,7 @@
           {{description}}
         </div>
         <div class="modal-footer">
-          <button type="button" v-on:click="modalAction" data-dismiss="modal" class="btn btn-primary">Finish</button>
+          <button type="button" v-on:click="modalAction" data-dismiss="modal" class="btn btn-primary">Close</button>
         </div>
       </div>
     </div>
