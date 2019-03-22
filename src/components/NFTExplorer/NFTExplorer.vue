@@ -153,7 +153,6 @@
 				}
 				return tokensOfOwnerRequest
 			},
-
 			convertHexToString(hex) {
     			var str = '';
     			for (var i = 0; (i < hex.length && hex.substr(i, 2) !== '00'); i += 2)
@@ -241,6 +240,7 @@
 			},
 			loadTokensForContractPage() {
 				var self = this
+				console.log("hello")
 				self.$emit('isWaitingForDapi')
 				var smartEcoRouter = new smartEco.SmartEcoRouter()
 				smartEcoRouter.start()
@@ -278,8 +278,12 @@
 				self.totalSupply = 0
 				smartEcoRouter.invokeRead(self.buildTotalSupplyRequest())
 					.then(function(r) {
+						console.log(r)
+						console.log(parseInt(r["stack"][0]["value"], 16))
 						self.totalSupply = parseInt(r["stack"][0]["value"], 16)
+						console.log(self.totalSupply)
 						self.total_pages = Math.ceil(self.totalSupply / self.items_per_page)
+						console.log("will load for page")
 						self.loadTokensForContractPage()
 					})
 					.catch(function() {
