@@ -52,28 +52,24 @@
 		
 		<section class="container" v-if="totalSupply == undefined || totalSupply == 0"> 
 				<div class="col-12 mx-auto text-center">
-					<div class="landing-info-title mb-1">How to get started</div>
-					<div class="landing-info mb-1">1. <a target="_blank" href="https://o3.network/">Download O3 Desktop</a></div>
-					<div class="landing-info mb-1">2. <a target="_blank" href="https://o3.network/">Switch Network to Testnet</a></div>
-					<div class="landing-info mb-1">3. Explore &amp; Mint NFT's</div>
-				</div>
-				<br>
-				<div class="col-12 mx-auto text-center">
 					<div class="landing-info-title mb-1">Don't know any NFT addresses or contracts? Check these out!</div>
 					<div class="landing-info mb-1">O3 Foundry <a href="#" v-on:click="navigateToFoundry">d3fcdaa4f7f14e9044120f3372388570b2f40235</a></div>
 					<div class="landing-info mb-1">HashPuppies, the OG NFT <a href="#" v-on:click="navigateToHashPuppy">e7b2046b2412c4c7f1531ce144a73d47c3b272fe</a></div>
 					<div class="landing-info mb-1">Or mint your own tokens in the O3 Foundry</div>
 				</div>
 	</section>
+	<modal ref="modal" :title="modalTitle" :description="modalDescription" :modalAction="modalAction"></modal>
 </div>
 </template>
 
 <script type="text/javascript">
 	import NFTCard from './NFTCard.vue'
-	
+	import modal from './../modal.vue'
+
 	export default {
 		components: {
-			NFTCard
+			NFTCard,
+			modal
 		},
 		data: function () {
 			return {
@@ -92,7 +88,12 @@
 				tokens:[],
 				current_page: 0,
 				items_per_page: 9,
-				total_pages: 0
+				total_pages: 0,
+
+				//modal stuff
+				modalTitle: "Connect to the test network",
+        modalDescription: "Looks like your O3 wallet is set to the mainnet. Currently only test net is available for this app. Please change to testnet in the settings menu",
+				modalAction: function() {}
 			}
 		}, 
 		methods:{
@@ -306,7 +307,21 @@
 					this.valid_input = false
 				}
 			},
-		},
+		}, mounted: function () {
+				var self = this
+				var smartEcoRouter = new smartEco.SmartEcoRouter()
+				smartEcoRouter.start()
+				smartEcoRouter.getNetworks()
+				.then(function(r) {
+					console.log(r)
+					if (r.networks.includes("TestNet") == false) {
+						let element = self.$refs.modal.$el
+            $(element).modal('show')
+					}
+				}).catch(function(e){
+					console.log(e)
+				})
+    }
 	};
 </script>
 
