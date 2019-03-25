@@ -2,11 +2,11 @@
   <div id="app">
     <dAPIProgress v-if="waitingForDapi"> </dAPIProgress>
     <AppHeader></AppHeader>
-    <keep-alive>
-      <router-view v-on:isWaitingForDapi="setWaiting(true)"  v-on:isNotWaitingForDapi="setWaiting(false)"></router-view>
+    <keep-alive :exclude="excludeList">
+    <router-view v-on:isWaitingForDapi="setWaiting(true)"  v-on:isNotWaitingForDapi="setWaiting(false)"></router-view>
     </keep-alive>
     <AppFooter></AppFooter>
-  </div>
+  </div>  
   
 </template>
 
@@ -17,7 +17,6 @@ import AppFooter from './components/AppFooter.vue'
 import TokenFoundry from './components/TokenFoundry.vue'
 import TokenDetails from './components/TokenDetails.vue'
 import dAPIProgress from './components/dAPIProgress.vue'
-
 
 
 export default {
@@ -31,7 +30,8 @@ export default {
     AppFooter
   }, data: function() {
     return {
-      waitingForDapi: false
+      waitingForDapi: false,
+      excludeList: "TokenDetails"
     }
   }, methods: {
     setWaiting(isWaitingForDapi) {
