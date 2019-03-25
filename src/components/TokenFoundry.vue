@@ -92,7 +92,7 @@ export default {
         return {
             "to_search_uri": "https://media.giphy.com/media/Wyt6sLEjKjaFjzybth/giphy.gif",
             "loaded_uri": "https://media.giphy.com/media/Wyt6sLEjKjaFjzybth/giphy.gif",
-            "contract_hash": "d3fcdaa4f7f14e9044120f3372388570b2f40235",
+            "contract_hash": "7fe1d36ed60846975e70ec8b6fc0bef08b033107",
             "contract_is_nft": true,
             "recipient": "", 
             "show-modal": false,
@@ -188,9 +188,7 @@ export default {
             self.$emit('isWaitingForDapi')
             var smartEcoRouter = new smartEco.SmartEcoRouter()
             smartEcoRouter.start()
-            var r = self.buildMintTokensRequest()
-            console.log(r)
-            smartEcoRouter.invoke(r)
+            smartEcoRouter.invoke(self.buildMintTokensRequest())
             .then(function(r) {
                 console.log(r)
                 self.$emit('isNotWaitingForDapi')

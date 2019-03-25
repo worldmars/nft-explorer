@@ -61,7 +61,7 @@
 		<section class="container" v-if="totalSupply == undefined || totalSupply == 0"> 
 				<div class="col-12 mx-auto text-center">
 					<div class="landing-info-title mb-1">Don't know any NFT addresses or contracts? Check these out!</div>
-					<div class="landing-info mb-1">O3 Foundry <a href="#" v-on:click="navigateToFoundry">d3fcdaa4f7f14e9044120f3372388570b2f40235</a></div>
+					<div class="landing-info mb-1">O3 Foundry <a href="#" v-on:click="navigateToFoundry">7fe1d36ed60846975e70ec8b6fc0bef08b033107</a></div>
 					<div class="landing-info mb-1">HashPuppies, the OG NFT <a href="#" v-on:click="navigateToHashPuppy">e7b2046b2412c4c7f1531ce144a73d47c3b272fe</a></div>
 					<div class="landing-info mb-1">Or mint your own tokens in the O3 Foundry</div>
 				</div>
@@ -91,7 +91,7 @@
 				image_url:"",
 				totalSupply: undefined,
 				//Known Contracts should probably be parsed out into a server side method
-				known_contracts: [ "d3fcdaa4f7f14e9044120f3372388570b2f40235",
+				known_contracts: [ "7fe1d36ed60846975e70ec8b6fc0bef08b033107",
 													"4e2d82efae9bae7e6d3ccb016ab768a607c49c10"
 													],
 				tokens:[],
@@ -191,7 +191,7 @@
 			},
 
 			navigateToFoundry() {
-				this.search_value = "d3fcdaa4f7f14e9044120f3372388570b2f40235"
+				this.search_value = "7fe1d36ed60846975e70ec8b6fc0bef08b033107"
 				this.searchForValue()
 			},
 
@@ -217,9 +217,7 @@
 						.then(function(values) {
 							var r = values[0]
 							var contract = values[1]
-							console.log(r)
 							var deserialized = Neon.sc.StackItem.deserialize(r["stack"][0]["value"])
-							console.log(deserialized)
 							if (self.known_contracts[self.known_contracts.length-1] == contract 
 							&& deserialized["value"].length == 0 && self.totalSupply == 0) {
 								self.addressHasNoTokens = true
@@ -234,6 +232,7 @@
 								var ownerRequest = self.buildOwnerOfRequest(id, contract)	
 								Promise.all([smartEcoRouter.invokeRead(uriRequest), smartEcoRouter.invokeRead(ownerRequest),Promise.resolve(id), Promise.resolve(contract)])
 									.then(function(values) {
+										console.log(values)
 										self.$emit('isNotWaitingForDapi')
 										var uri = self.convertHexToString(values[0]["stack"][0]["value"])
 										var owner = self.convertHexToString(values[1]["stack"][0]["value"])
@@ -245,13 +244,15 @@
 										})
 										self.totalSupply +=1
 									})
-									.catch(function() {
+									.catch(function(e) {
+										console.log(e)
 										self.$emit('isNotWaitingForDapi')
 										self.unknownError = true
 									})
 							}
 						})
-						.catch(function() {
+						.catch(function(e) {
+							console.log(e)
 							self.$emit('isNotWaitingForDapi')
 							self.unknownError = true
 						})
