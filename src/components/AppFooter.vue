@@ -18,7 +18,7 @@
                     </div>
                 </div>
                 <div class="d-flex justify-content-center">
-                    <a href="mailto:hello@o3.network" target="_blank" class="btn btn-primary btn-o3-primary">Get in touch with us today</a>
+                    <a href="https://neodapitestbed.o3.app/" target="_blank" class="btn btn-primary btn-o3-primary">Check out the dAPI Today!</a>
                     </div>
                 </div>
             </div>
