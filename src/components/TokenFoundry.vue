@@ -170,6 +170,7 @@ export default {
         }, validateFields() {
             this.uri_is_valid = true
             this.address_is_valid = true
+            this.loaded_uri = this.to_search_uri
             if (this.loaded_uri.match(/\.(jpeg|jpg|gif|png)$/) == null || this.loaded_uri.startsWith("https://media.giphy.com") == false) {
                 this.uri_is_valid = false
                 return false
