@@ -92,7 +92,8 @@
 				totalSupply: undefined,
 				//Known Contracts should probably be parsed out into a server side method
 				known_contracts: [ "7fe1d36ed60846975e70ec8b6fc0bef08b033107",
-													"4e2d82efae9bae7e6d3ccb016ab768a607c49c10"
+													"4e2d82efae9bae7e6d3ccb016ab768a607c49c10",
+													"0df71b4a31a35b4dc86eeb8d062bc9d8d6235929"
 													],
 				tokens:[],
 				current_page: 0,
