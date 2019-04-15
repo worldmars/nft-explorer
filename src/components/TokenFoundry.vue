@@ -171,7 +171,8 @@ export default {
             this.uri_is_valid = true
             this.address_is_valid = true
             this.loaded_uri = this.to_search_uri
-            if (this.loaded_uri.match(/\.(jpeg|jpg|gif|png)$/) == null || this.loaded_uri.startsWith("https://media.giphy.com") == false) {
+            //make sure url is a valid image, and if using O3 contract to only allow it via giphy
+            if (this.loaded_uri.match(/\.(jpeg|jpg|gif|png)$/) == null || (this.contract_hash == "7fe1d36ed60846975e70ec8b6fc0bef08b033107" && this.loaded_uri.startsWith("https://media.giphy.com") == false)) {
                 this.uri_is_valid = false
                 return false
             } else if (Neon.wallet.isAddress(this.recipient) == false) {
