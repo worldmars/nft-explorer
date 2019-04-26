@@ -7,8 +7,8 @@
                 <img width="100%" height="250px;" padding-top="100%" class="rounded" style="object-fit: cover;" v-bind:src=uri>
                 <div class="info-title">Owner</div>
                 <div class="info-subtitle">{{ owner }}</div>
-                <div class="info-title">Contract</div>
-                <div class="info-subtitle">{{ contract }}</div>
+                <div class="info-title" v-if="attributes != undefined">Attributes</div>
+                <div class="info-subtitle">{{ attributes }}</div>
             </div>
         </div>
     </div>
@@ -18,7 +18,7 @@
 <script>
 export default {
   name: 'NFTCard',
-  props: ['token_id', 'owner', 'uri', 'contract']
+  props: ['token_id', 'owner', 'uri', 'contract', 'attributes']
 }
 </script>
 

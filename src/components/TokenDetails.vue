@@ -1,8 +1,11 @@
 <template>
     <div>
         <div class="col-sm-6 col-lg-4 mb-lg-4 mx-auto mt-5">
-            <NFTCard  :token_id="$route.params.id" :owner="owner" :uri="uri" :contract="$route.params.contract_hash"></NFTCard>
+            <NFTCard  :token_id="$route.params.id" :owner="owner" :uri="uri" :contract="$route.params.contract_hash" :attributes="attributes"></NFTCard>
         </div>
+        
+
+
         <div class=row>
             <div class="col col-md-6 mx-auto">
                 <h2 class="text-center">Why is this cool?</h2>
@@ -62,6 +65,7 @@
             return {
                 "uri": "",
                 "owner": "",
+                "attributes":"",
                 "transfer_address":"",
 
                 //modal after
@@ -89,7 +93,19 @@
   						],
   						"network": "TestNet"
 					}
-				return uriRequest
+            },
+            buildAttributesRequest() {
+                return {
+						"scriptHash": this.$route.params.contract_hash,
+  						"operation": "rwProperties",
+  						"args": [
+    						{
+      							"type": 'Integer',
+      							"value": parseInt(this.$route.params.id, 10)
+      						}
+  						],
+  						"network": "TestNet"
+					}
             },
             buildOwnerOfRequest() {
                 return {
@@ -126,17 +142,18 @@
                 console.log("loading token card")
                 var uriRequest = this.buildURIRequest()
                 var ownerRequest = this.buildOwnerOfRequest()
+                var attributesRequest = this.buildAttributesRequest()
                 var self = this
                 var smartEcoRouter = new smartEco.SmartEcoRouter()
                 smartEcoRouter.start()
                 console.log(uriRequest)
                 
-                Promise.all([smartEcoRouter.invokeRead(uriRequest), smartEcoRouter.invokeRead(ownerRequest)])
+                Promise.all([smartEcoRouter.invokeRead(uriRequest), smartEcoRouter.invokeRead(ownerRequest),
+                                                                    smartEcoRouter.invokeRead(attributesRequest)])
                 .then(function(values) {
                     self.uri = self.convertHexToString(values[0]["stack"][0]["value"])
                     self.owner = Neon.wallet.getAddressFromScriptHash(Neon.u.reverseHex(values[1]["stack"][0]["value"]))
-
-                    console.log(self.uri)  
+                    self.attributes = self.convertHexToString(values[2]["stack"][0]["value"])
                 })  
                 .catch(function(e) {
                     console.log(e)

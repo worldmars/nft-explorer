@@ -55,9 +55,19 @@
             </div>
         </div>
     </div>
-
+    <div class="row mb-3">
+        <div class="col-10 col-md-6 mx-auto">
+            <h6>Enter unique attributes</h6>
+            <textarea v-model="attributes" v-bind:class= "{'is-invalid': attributes_is_valid === false}" class="form-control" placeholder="This must be in a valid json format" rows="4">
+            </textarea>
+            <div class="invalid-feedback">
+                Please provide a valid json object for your attributes
+            </div>
+        </div>
+    </div>
+    
     <div class="col-10 col-sm-6 col-lg-4 mb-lg-4 mx-auto">
-        <NFTCard  :token_id="100" :owner="recipient" :uri="loaded_uri" :contract="contract_hash"></NFTCard>
+        <NFTCard  :token_id="100" :owner="recipient" :uri="loaded_uri" :contract="contract_hash" :attributes="attributes"></NFTCard>
     </div>
 
     <div class="row justify-content-center mb-3">
@@ -93,6 +103,7 @@ export default {
             "to_search_uri": "https://media.giphy.com/media/Wyt6sLEjKjaFjzybth/giphy.gif",
             "loaded_uri": "https://media.giphy.com/media/Wyt6sLEjKjaFjzybth/giphy.gif",
             "contract_hash": "7fe1d36ed60846975e70ec8b6fc0bef08b033107",
+            "attributes": "",
             "contract_is_nft": true,
             "recipient": "", 
             "show-modal": false,
@@ -100,6 +111,7 @@ export default {
 
             "address_is_valid": undefined,
             "uri_is_valid": undefined,
+            "attributes_is_valid": undefined,
 
             //modal after
             "modalTitle": "",
@@ -128,14 +140,13 @@ export default {
         },
         buildMintTokensRequest() {
             var time = new Date()
-            var rwProps = {"created_at": time.getTime()}
             var mintTokensRequest = { "scriptHash": this.contract_hash,
                 "operation": "mintToken",
                 "args": [
                     {"type": "ByteArray", "value": Neon.u.reverseHex(Neon.wallet.getScriptHashFromAddress(this.recipient))},
                     {"type": "ByteArray", "value": "4f3320526f636b73"},
                     {"type": "ByteArray", "value": Neon.u.str2hexstring(this.loaded_uri)},
-                    {"type": "ByteArray", "value": Neon.u.str2hexstring(JSON.stringify(rwProps))},
+                    {"type": "ByteArray", "value": Neon.u.str2hexstring(this.attributes)},
                 ],
                 "network": "TestNet",
                 "fee": "0"
@@ -167,9 +178,19 @@ export default {
                     self.contract_is_nft = false
                 })                        
             }
-        }, validateFields() {
+        }, 
+        isJsonString(str) {
+            try {
+                var json = JSON.parse(str);
+                return (typeof json === 'object');
+            } catch (e) {
+                return false;
+            }
+        },
+        validateFields() {
             this.uri_is_valid = true
             this.address_is_valid = true
+            this.attributes_is_valid = true
             this.loaded_uri = this.to_search_uri
             //make sure url is a valid image, and if using O3 contract to only allow it via giphy
             if (this.loaded_uri.match(/\.(jpeg|jpg|gif|png)$/) == null || (this.contract_hash == "7fe1d36ed60846975e70ec8b6fc0bef08b033107" && this.loaded_uri.startsWith("https://media.giphy.com") == false)) {
@@ -178,7 +199,11 @@ export default {
             } else if (Neon.wallet.isAddress(this.recipient) == false) {
                 this.address_is_valid = false
                 return false
-            } 
+            } else if (this.isJsonString(this.attributes) == false) {
+                console.log(this.attributes)
+                this.attributes_is_valid = false
+                return false    
+            }
             return true
         },
 
