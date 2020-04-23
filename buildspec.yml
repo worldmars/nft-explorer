@@ -1,0 +1,24 @@
+version: 0.2
+
+env:
+  variables:
+    BUCKET_NAME: "nft.o3.app"
+    DISTRIBUTION_ID: "EXFDA08JX7HCR"
+  
+phases:
+  install:
+    runtime-versions:
+      nodejs: 10
+    commands:
+      - npm install -g yarn
+  pre_build:
+    commands:
+      - yarn install
+  build:
+    commands:
+      - yarn build
+      - cd dist
+  post_build:
+    commands:
+      - aws s3 sync . "s3://${BUCKET_NAME}" --delete
+      - aws cloudfront create-invalidation --distribution-id "${DISTRIBUTION_ID}" --paths "/*"
