@@ -2,9 +2,9 @@ version: 0.2
 
 env:
   variables:
-    BUCKET_NAME: "nft.o3.app"
-    DISTRIBUTION_ID: "EXFDA08JX7HCR"
-  
+    BUCKET_NAME: "nft-o3.app"
+    DISTRIBUTION_ID: "E35OUG7I4SQKFV"
+
 phases:
   install:
     runtime-versions:
